@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Lập Quẻ Lục Nhâm Đại Độn</title>
+    <style>
+        :root {
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --primary-color: #2980b9;
+            --accent-color: #d35400;
+            --border-color: #dcdde1;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; line-height: 1.6; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        h1, h2, h3 { color: #2c3e50; margin-top: 0; }
+        header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid var(--primary-color); padding-bottom: 10px; }
+
+        .card { background: var(--card-bg); border-radius: 8px; padding: 25px; margin-bottom: 25px; box-shadow: var(--shadow); border: 1px solid var(--border-color); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; }
+        input[type="datetime-local"], select { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box; font-size: 14px; }
+        .radio-group { display: flex; gap: 15px; margin-top: 5px; }
+        button { background-color: var(--primary-color); color: white; border: none; padding: 12px 25px; font-size: 16px; font-weight: 600; border-radius: 4px; cursor: pointer; width: 100%; transition: background 0.2s; }
+        button:hover { background-color: #1c6393; }
+        .btn-secondary { background-color: #7f8c8d; width: auto; padding: 10px 15px; }
+        .btn-secondary:hover { background-color: #636e72; }
+
+        .info-list { list-style: none; padding: 0; margin: 0; }
+        .info-list li { padding: 8px 0; border-bottom: 1px dashed var(--border-color); }
+        .info-list li:last-child { border-bottom: none; }
+        .highlight-sat { color: var(--accent-color); font-weight: bold; }
+
+        .khoa-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; text-align: center; }
+        @media (max-width: 600px) { .khoa-grid { grid-template-columns: 1fr 1fr; } }
+        .khoa-box { background: #f8f9fa; border: 1px solid var(--border-color); border-radius: 6px; padding: 15px; position: relative; }
+        .khoa-title-ta { font-weight: bold; background: #e8f4f8; border-bottom: 2px solid #2980b9; padding: 5px; margin:-15px -15px 10px -15px; border-top-left-radius: 6px; border-top-right-radius: 6px; }
+        .khoa-title-khach { font-weight: bold; background: #fdf2e9; border-bottom: 2px solid #d35400; padding: 5px; margin:-15px -15px 10px -15px; border-top-left-radius: 6px; border-top-right-radius: 6px; }
+
+        .badge-quan-he { padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; display: inline-block; margin-top: 4px; background: #34495e; color: #fff; }
+        .truyen-container { display: flex; justify-content: space-around; gap: 15px; }
+        @media (max-width: 600px) { .truyen-container { flex-direction: column; } }
+        .truyen-box { flex: 1; background: #fff8f5; border: 1px solid #f3d1c1; border-radius: 6px; padding: 15px; text-align: center; }
+        .truyen-box h4 { margin: 0 0 10px 0; color: var(--accent-color); }
+        .tang-hinh-box { background: #f4ecf7; border: 1px dashed #9b59b6; padding: 8px; margin-top: 10px; border-radius: 4px; font-size: 13px; text-align: left; }
+
+        .analysis-box { margin-top: 15px; padding: 12px; border-radius: 6px; font-size: 15px; }
+        .analysis-thoi-gian { background: #fef9e7; border-left: 4px solid #f1c40f; }
+        .analysis-lat-keo { background: #f9ebea; border-left: 4px solid #e74c3c; margin-top: 15px; }
+        .analysis-vimo { background: #fdf2e9; border-left: 4px solid #e67e22; margin-top: 10px; }
+        .analysis-dong-luc { background: #f4f6f9; border-left: 4px solid #34495e; margin-top: 15px; }
+        
+        .cuu-tong-mon-box { background: #e8f4f8; border-left: 4px solid #2980b9; padding: 12px; margin-bottom: 15px; border-radius: 4px; display: flex; align-items: center; justify-content: space-between;}
+
+        .astrolabe-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, minmax(145px, auto)); gap: 8px; background: #eef2f5; padding: 15px; border-radius: 8px; border: 2px solid var(--border-color); }
+        @media (max-width: 768px) { .astrolabe-grid { grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 5px; } }
+        .palace { background: #fff; border: 2px solid #bdc3c7; border-radius: 6px; padding: 8px; text-align: center; display: flex; flex-direction: column; justify-content: center; font-size: 13px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); position: relative; }
+        .palace.cung-tuan-khong { background-color: #fcfcfc; border-color: #95a5a6; opacity: 0.9; }
+        .palace-dia { position: absolute; bottom: 5px; right: 8px; font-size: 24px; font-weight: bold; color: #ecf0f1; z-index: 0; }
+        .palace-content { position: relative; z-index: 1; }
+        .palace-thien { font-size: 18px; font-weight: 900; color: #2c3e50; }
+        .palace-khi { font-size: 10px; color: #2c3e50; font-weight: 800; background-color: #e8f6f3; border: 1px solid #1abc9c; border-radius: 3px; padding: 1px 4px; display: inline-block; margin-top: 3px; }
+        .palace-tuong { color: #c0392b; font-weight: bold; font-size: 14px; margin-top: 2px; }
+        .palace-chien { font-size: 9px; color: #7f8c8d; line-height: 1.1; margin-top: 1px; }
+        .palace-than { color: #27ae60; font-weight: bold; font-size: 12px; margin-top: 3px; }
+        .palace-truong-sinh { color: #8e44ad; font-size: 11px; font-style: italic; }
+        
+        .palace-sat { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; margin-top: 5px; }
+        .tag-sat { font-size: 10px; font-weight: bold; padding: 2px 4px; border-radius: 3px; color: white; }
+        .tag-cat-sat { background-color: #27ae60; } 
+        .tag-hung-sat { background-color: #c0392b; } 
+        .tag-dao-hoa { background-color: #e84393; } 
+        .tag-quyen-luc { background-color: #8e44ad; } 
+        .tag-neutral { background-color: #7f8c8d; color: white; }
+        
+        .ngu-hanh-label { font-size: 12px; font-weight: bold; color: #2980b9; background: #eafaf1; padding: 1px 4px; border-radius: 4px; border: 1px solid #2ecc71; margin-left: 4px;}
+
+        .badge-container { margin-top: 4px; display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; }
+        .badge { color: white; padding: 2px 5px; border-radius: 3px; font-size: 10px; font-weight: bold; }
+        .badge-tk { background-color: #34495e; }
+        .badge-nm { background-color: #8b4513; }
+        .badge-chiem-thoi { background-color: #3498db; }
+        .badge-nguyet-tuong { background-color: #f39c12; color: #fff; }
+        .badge-ban-menh { background-color: #8e44ad; color: #fff; }
+        .badge-hanh-nien { background-color: #16a085; color: #fff; }
+
+        .astrolabe-center { grid-column: 2 / 4; grid-row: 2 / 4; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #95a5a6; text-align: center; }
+        .astrolabe-center h3 { margin: 0; color: var(--primary-color); font-size: 22px; letter-spacing: 2px; }
+
+        .cung-Tỵ { grid-column: 1; grid-row: 1; } .cung-Ngọ { grid-column: 2; grid-row: 1; } .cung-Mùi { grid-column: 3; grid-row: 1; } .cung-Thân { grid-column: 4; grid-row: 1; }
+        .cung-Dậu { grid-column: 4; grid-row: 2; } .cung-Tuất { grid-column: 4; grid-row: 3; } .cung-Hợi { grid-column: 4; grid-row: 4; } .cung-Tý { grid-column: 3; grid-row: 4; }
+        .cung-Sửu { grid-column: 2; grid-row: 4; } .cung-Dần { grid-column: 1; grid-row: 4; } .cung-Mão { grid-column: 1; grid-row: 3; } .cung-Thìn { grid-column: 1; grid-row: 2; }
+
+        .warning-box { background-color: #fff5f5; border-left: 5px solid #c0392b; color: #c0392b; padding: 15px; border-radius: 4px; margin-bottom: 25px; }
+
+        details { background: #fdfdfd; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 10px; padding: 10px; }
+        summary { font-weight: bold; cursor: pointer; color: var(--primary-color); outline: none; font-size: 16px; padding: 5px 0; }
+        summary:hover { color: var(--accent-color); }
+        .ref-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+        .ref-table th, .ref-table td { border: 1px solid var(--border-color); padding: 8px; text-align: left; }
+        .ref-table th { background-color: #e9ecef; }
+        .tag-cat { background: #d4edda; color: #155724; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;}
+        .tag-hung { background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;}
+        
+        textarea { width: 100%; height: 250px; padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; font-family: 'Courier New', Courier, monospace; font-size: 13px; background-color: #fafafa; resize: vertical; box-sizing: border-box; }
+        /* Hiệu ứng Radar khóa mục tiêu Dụng Thần */
+        @keyframes pulse-target {
+            0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+        }
+        .target-palace {
+            border: 3px solid #e74c3c !important;
+            background-color: #fdf2e9 !important;
+            transform: scale(1.03);
+            z-index: 10;
+            animation: pulse-target 2s infinite;
+        }
+        .target-label {
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            background: #e74c3c; color: #fff; font-size: 10px; font-weight: bold;
+            padding: 2px 8px; border-radius: 10px; z-index: 11; letter-spacing: 0.5px;
+            white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        /* HIỆU ỨNG KHUNG TẤT PHÁP PHÚ */
+        .tpp-wrapper {
+            margin-bottom: 25px;
+        }
+        .tpp-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #8e44ad; /* Màu tím huyền bí/học thuật */
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #8e44ad;
+            padding-bottom: 8px;
+        }
+        .tpp-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* Khoảng cách giữa các câu phú */
+        }
+        .tpp-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid #8e44ad; 
+            border-radius: 8px;
+            padding: 15px 18px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            font-size: 15.5px;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+        /* Hiệu ứng trượt nhẹ khi trỏ chuột vào */
+        .tpp-card:hover {
+            transform: translateX(6px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+            border-left-color: var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+            <h1>Hệ Thống Lập Quẻ Lục Nhâm Đại Độn</h1>
+            <p>Bí Tàng Đại Lục Nhâm - Quách Tải Lai & Tất Pháp Phú</p>
+            
+            <a href="/history" style="display: inline-block; margin-top: 10px; padding: 8px 15px; background-color: #27ae60; color: white; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📜 Xem Lịch Sử Gieo Quẻ</a>
+        </header>
+
+    <div class="card">
+        <h2>Thiết Lập Bối Cảnh Lập Quẻ</h2>
+        <form method="POST" action="/">
+            <input type="hidden" id="lat" name="lat" value="21.0285">
+            <input type="hidden" id="lon" name="lon" value="105.8542">
+            <input type="hidden" id="tz_offset" name="tz_offset" value="7">
+            <div style="background: #e8f4f8; padding: 15px; border-radius: 6px; border-left: 4px solid #2980b9; margin-bottom: 20px;">
+                <h3 style="margin-top: 0; color: #2980b9;">0. Xác định Mục Tiêu (Dụng Thần)</h3>
+                <div class="form-group">
+                    <label for="cau_hoi">Câu hỏi cụ thể của người xem:</label>
+                    <input type="text" id="cau_hoi" name="cau_hoi" placeholder="VD: Dự án bất động sản tháng tới có chốt được lời không?" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="nhom_van_de">Thuộc nhóm vấn đề nào? (Hệ thống sẽ tự động khóa mục tiêu Dụng Thần trên Tinh bàn):</label>
+                    <select id="nhom_van_de" name="nhom_van_de" style="font-weight: bold; color: #d35400;">
+                        <option value="khac">--- Chọn nhóm vấn đề (Mặc định) ---</option>
+                        <option value="kinh_doanh">💰 Kinh Doanh / Đầu Tư / Tài Lộc / Đòi Nợ</option>
+                        <option value="thi_cu">🎓 Công Danh / Thi Cử / Xin Việc</option>
+                        <option value="tinh_duyen">❤️ Tình Duyên / Hôn Nhân / Ngoại Tình</option>
+                        <option value="benh_tat">🏥 Bệnh Tật / Sức Khỏe</option>
+                        <option value="kien_tung">⚖️ Kiện Tụng / Pháp Lý</option>
+                        <option value="mat_trom">🔍 Tìm Đồ Thất Lạc / Mất Trộm</option>
+                        <option value="phong_thuy">🏡 Phong Thủy / Mua Bán Nhà Đất</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-grid">
+                <div>
+                    <h3>1. Thời Gian Gieo Quẻ</h3>
+                    <div class="form-group">
+                        <label for="thoi_gian_que">Chọn Ngày & Giờ:</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="datetime-local" id="thoi_gian_que" name="thoi_gian_que" required>
+                            <button type="button" class="btn-secondary" onclick="setCurrentTime()">Hiện tại</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="background-color: #f8f9fa; padding: 10px; border-radius: 4px; border: 1px solid #dcdde1;">
+                        <label style="font-size: 13px; color: var(--primary-color);">Tọa độ Địa lý (Quyết định Ngày/Đêm & Nguyệt Tướng):</label>
+                        <div id="gps-status" style="font-size: 13px; color: #7f8c8d; margin-bottom: 5px;">📍 Đang dùng mặc định (Hà Nội, UTC+7)</div>
+                        <button type="button" class="btn-secondary" style="font-size: 12px; padding: 5px 10px; width: auto;" onclick="getLocation()">🌍 Làm mới Tọa độ IP</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tru_da">Phân biệt Ngày/Đêm (Thời tiết thực tế):</label>
+                        <select id="tru_da" name="tru_da">
+                            <option value="Auto">Tự động tính theo Thiên văn (Mặt trời mọc/lặn)</option>
+                            <option value="Ngày">Ép buộc: Ban Ngày (Trú Quý)</option>
+                            <option value="Đêm">Ép buộc: Ban Đêm (Dạ Quý)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Hệ Thống Lịch Pháp:</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="lich_que" value="duong" checked> Dương Lịch</label>
+                            <label><input type="radio" name="lich_que" value="am"> Âm Lịch</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3>2. Sinh Thần Bản Mệnh (Bắt buộc để Lật Kèo)</h3>
+                    <div class="form-group">
+                        <label for="thoi_gian_sinh">Ngày & Giờ Sinh:</label>
+                        <input type="datetime-local" id="thoi_gian_sinh" name="thoi_gian_sinh">
+                    </div>
+                    <div class="form-group">
+                        <label>Lịch Sinh Thần & Giới Tính:</label>
+                        <div class="radio-group" style="margin-bottom: 10px;">
+                            <label><input type="radio" name="lich_sinh" value="duong" checked> Dương Lịch</label>
+                            <label><input type="radio" name="lich_sinh" value="am"> Âm Lịch</label>
+                        </div>
+                        <div class="radio-group">
+                            <label><input type="radio" name="gioi_tinh" value="Nam" checked> Nam Mệnh</label>
+                            <label><input type="radio" name="gioi_tinh" value="Nữ"> Nữ Mệnh</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 15px;">
+                <button type="submit">KHỞI TẠO ĐẠI LỤC NHÂM TINH BÀN</button>
+            </div>
+        </form>
+    </div>
+
+    {% if tinh_ban %}
+    {% if tinh_ban.is_history_view %}
+    <div style="background-color: #ebf5fb; border-left: 5px solid #2980b9; padding: 15px; border-radius: 4px; margin-bottom: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3 style="margin-top: 0; color: #2980b9;">🕒 CHẾ ĐỘ NGHIỆM LÝ (CỖ MÁY THỜI GIAN)</h3>
+        <p style="margin-bottom: 0; color: #2c3e50; font-size: 15px;">
+            Bạn đang xem lại hồ sơ <strong>Quẻ số #{{ tinh_ban.history_id }}</strong>. Quẻ này được gieo trong quá khứ lúc: <strong style="color: #d35400;">{{ tinh_ban.time_str }}</strong>.<br>
+            <i>(Toàn bộ mâm tinh bàn bên dưới được phục dựng lại chính xác 100% như lúc ban đầu).</i>
+        </p>
+    </div>
+    {% endif %}
+    {% if tinh_ban.canh_bao_tat_phap %}
+    <div class="tpp-wrapper">
+        <div class="tpp-title">
+            📜 Lời Phán Cốt Lõi Từ Tất Pháp Phú
+        </div>
+        <div class="tpp-list">
+            {% for cb in tinh_ban.canh_bao_tat_phap %}
+            <div class="tpp-card">
+                <strong>{{ cb }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <h2>* BỐI CẢNH THỜI GIAN</h2>
+        <ul class="info-list">
+            <li><strong>Thời gian lập quẻ:</strong> {{ tinh_ban.time_str }} (Lịch gốc đã chọn: {{ tinh_ban.loai_lich_que }})</li>
+            <li><strong>Tứ trụ gieo quẻ:</strong> Năm {{ tinh_ban.tu_tru.nam }} - Tháng {{ tinh_ban.tu_tru.thang }} - Ngày {{ tinh_ban.tu_tru.ngay }} - Giờ {{ tinh_ban.tu_tru.gio }}</li>
+            <li style="background-color: #fcf3cf; padding: 5px; border-radius: 4px;">
+                <span class="highlight-sat">Nguồn cơn sự việc:</span> Chiêm Thời (Giờ gieo) <strong>{{ tinh_ban.chiem_thoi }}</strong> | Nguyệt Tướng (Thái Dương) <strong>{{ tinh_ban.nguyet_tuong }}</strong> (Giáng tại cung {{ tinh_ban.chiem_thoi }})
+            </li>
+            <li><span class="highlight-sat">Bầu trời (Trú Dạ):</span> {{ tinh_ban.msg_tru_da }}</li>
+            <li><span class="highlight-sat">Vòng xoay Định mệnh:</span> Quý Nhân đi <strong>{{ tinh_ban.chieu_xoay }}</strong></li>
+            <li><span class="highlight-sat">Thái Tuế:</span> Chi {{ tinh_ban.thai_tue }} | <span class="highlight-sat">Nguyệt Kiến:</span> Tháng {{ tinh_ban.nguyet_kien }}</li>
+            <li><strong>Tuần Không (Ngày):</strong> {{ tinh_ban.khong_vong.ngay | join(', ') }}</li>
+        </ul>
+        
+        <div class="analysis-box analysis-vimo">
+            <strong style="color: #d35400;">🌌 THIÊN ĐẠO VĨ MÔ (Phán quyết của Đất Trời lên Điểm Bắt Đầu):</strong>
+            <ul style="margin: 5px 0 0 20px; padding: 0; font-size: 14px; list-style-type: square;">
+                <li>{{ tinh_ban.vi_mo.thai_tue }}</li>
+                <li>{{ tinh_ban.vi_mo.nguyet_kien }}</li>
+                {% if tinh_ban.vi_mo.nguyet_tuong_menh %}
+                <li style="color: #27ae60; font-weight: bold; list-style-type: none; margin-top: 5px;">🌟 {{ tinh_ban.vi_mo.nguyet_tuong_menh }}</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <div class="analysis-box" style="background: #eafaf1; border-left: 4px solid #27ae60; margin-top: 10px;">
+            <strong style="color: #27ae60; font-size: 16px;">🎯 BƯỚC 1: TỔNG QUAN CHỦ - KHÁCH (Can Ngày vs Chi Ngày):</strong>
+            <ul style="margin: 5px 0 0 20px; padding: 0; font-size: 14px; color: #2c3e50;">
+                <li><strong>Đại diện TA:</strong> Can {{ tinh_ban.can_ngay }} <span class="ngu-hanh-label" style="background: #fff;">{{ tinh_ban.quan_he_can_chi.can_ngay_icon }}</span></li>
+                <li><strong>Đại diện VIỆC/KHÁCH:</strong> Chi {{ tinh_ban.chi_ngay }} <span class="ngu-hanh-label" style="background: #fff;">{{ tinh_ban.quan_he_can_chi.chi_ngay_icon }}</span></li>
+                <li style="margin-top: 5px; list-style-type: none;"><span style="color: #d35400; font-weight: bold;">➔ Kết luận:</span> <strong>{{ tinh_ban.quan_he_can_chi.msg }}</strong></li>
+            </ul>
+        </div>
+
+        {% if tinh_ban.sinh_than %}
+        <h3 style="margin-top: 20px;">* BẢN MỆNH NGƯỜI HỎI</h3>
+        <ul class="info-list">
+            <li><strong>Bát Tự:</strong> Giới tính {{ tinh_ban.sinh_than.gioi_tinh }} | {{ tinh_ban.sinh_than.tu_tru.nam }} - {{ tinh_ban.sinh_than.tu_tru.thang }} - {{ tinh_ban.sinh_than.tu_tru.ngay }} - {{ tinh_ban.sinh_than.tu_tru.gio }}</li>
+            <li><strong>Bản Mệnh (Cái Gốc):</strong> Chi <strong>{{ tinh_ban.sinh_than.menh }}</strong> | <strong>Nhật Chủ:</strong> {{ tinh_ban.sinh_than.nhat_chu_can }} ({{ tinh_ban.sinh_than.nhat_chu_hanh }})</li>
+            <li><strong>Hành Niên (Cái Ngọn/Vận năm nay):</strong> Đang cưỡi tại cung <strong>{{ tinh_ban.sinh_than.hanh_nien }}</strong></li>
+            
+            <li style="background-color: #fdf2e9; padding: 5px; border-radius: 4px; border-left: 3px solid #d35400;">
+                <span class="highlight-sat">👁️ Tình trạng hiện tại (Thượng Thần):</span> {{ tinh_ban.sinh_than.thuong_than_msg }}
+            </li>
+
+            <li><strong>Không Vong (Bản mệnh):</strong> Cung {{ tinh_ban.sinh_than.khong_vong.ngay | join(', ') }}</li>
+        </ul>
+        {% endif %}
+    </div>
+
+    {% if tinh_ban.the_tran %}
+    <div class="analysis-box" style="background: #f4ecf7; border-left: 5px solid #8e44ad; margin-bottom: 25px;">
+        <strong style="color: #8e44ad; font-size: 18px;">🌪️ CHÚ Ý: {{ tinh_ban.the_tran }}</strong><br>
+        <span style="font-weight: bold; color: #2c3e50; font-size: 15px;">{{ tinh_ban.the_tran_msg }}</span>
+    </div>
+    {% endif %}
+
+   <div class="card">
+        <h2>* TỨ KHÓA (Giao Xa Động Lực Học - Đọc Vị Mưu Đồ)</h2>
+        <div class="khoa-grid">
+            <div class="khoa-box {% if tinh_ban.tu_khoa[3].is_tuan_khong %}cung-tuan-khong{% endif %}">
+                <div class="khoa-title-khach">Khóa 4 (Sân sau Đối tác)</div>
+                <p style="line-height: 1.4; margin-bottom: 5px;">
+                    Thiên <strong style="font-size: 18px;">{{ tinh_ban.tu_khoa[3].tren }}</strong> 
+                    {% if tinh_ban.tu_khoa[3].is_tuan_khong %}<span style="color: #e74c3c; font-size: 14px; font-weight: bold;" title="Không Vong (Trống Rỗng)">⭕</span>{% endif %}
+                    <span class="ngu-hanh-label">{{ tinh_ban.tu_khoa[3].ngu_hanh_tren_icon }}</span><br>
+                    <span style="font-size: 12px; color: #e74c3c;">{{ tinh_ban.tu_khoa[3].sinh_khac }}</span><br>
+                    Địa <strong>{{ tinh_ban.tu_khoa[3].duoi }}</strong> <span class="ngu-hanh-label">{{ tinh_ban.tu_khoa[3].ngu_hanh_duoi_icon }}</span>
+                </p>
+                <div style="font-size: 11px; border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; text-align: left; line-height: 1.5;">
+                    <span style="color: #c0392b; font-weight: bold; font-size: 13px;">{{ tinh_ban.tu_khoa[3].luc_than }}</span> • <strong>{{ tinh_ban.tu_khoa[3].vuong_suy }}</strong><br>
+                    <b>Thần/Tướng:</b> {{ tinh_ban.tu_khoa[3].tuong }} <small style="color:#7f8c8d;">({{ tinh_ban.tu_khoa[3].noi_ngoai_chien }})</small><br>
+                    <b>Vòng Đời 12 TS:</b> {{ tinh_ban.tu_khoa[3].truong_sinh }}<br>
+                    <b>Loại Thần:</b> {{ tinh_ban.tu_khoa[3].loai_than }} | <b>Trời Địa:</b> {{ tinh_ban.tu_khoa[3].thien_dia_chien }}<br>
+                    
+                    {% if tinh_ban.tu_khoa[3].don_can_quan_he %}
+                    <div style="margin-top: 3px; color: #9b59b6; font-weight: bold;">
+                        ĐỘN: {{ tinh_ban.tu_khoa[3].don_can }} ({{ tinh_ban.tu_khoa[3].don_can_luc_than }})
+                        <span style="color: #e67e22; font-size: 10px; font-weight: normal; display: block;">[{{ tinh_ban.tu_khoa[3].don_can_quan_he }}]</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if tinh_ban.tu_khoa[3].thai_tue %}<div style="color: #8e44ad; font-weight: bold; margin-top: 2px;">👑 {{ tinh_ban.tu_khoa[3].thai_tue }}</div>{% endif %}
+                    
+                    <div style="margin-top: 4px; display: flex; flex-wrap: wrap; gap: 2px;">
+                        {% if tinh_ban.tu_khoa[3].is_nhap_mo %}<span class="badge badge-nm" style="font-size:9px; padding:1px 4px; background:#7f8c8d; color:white; border-radius:3px;">NHẬP MỘ</span>{% endif %}
+                        {% if tinh_ban.tu_khoa[3].is_chiem_thoi %}<span class="badge badge-chiem-thoi" style="font-size:9px; padding:1px 4px; background:#2980b9; color:white; border-radius:3px;">CHIÊM THỜI</span>{% endif %}
+                        {% if tinh_ban.tu_khoa[3].is_nguyet_tuong %}<span class="badge badge-nguyet-tuong" style="font-size:9px; padding:1px 4px; background:#f1c40f; color:black; border-radius:3px;">☀️ NGUYỆT TƯỚNG</span>{% endif %}
+                    </div>
+                    
+                    {% if tinh_ban.tu_khoa[3].than_sat %}
+                    <div style="margin-top: 5px; display: flex; flex-wrap: wrap; gap: 2px;">
+                        {% for sat in tinh_ban.tu_khoa[3].than_sat %}
+                            <span class="tag-sat {% if sat in ['Thiên Đức (Giải Cứu)', 'Nguyệt Đức (Giải Cứu)', 'Thiên Y (Thần Y)', 'Thiên Mã', 'Thiên Lộc'] %}tag-cat-sat{% else %}tag-hung-sat{% endif %}" style="font-size: 9px; padding: 1px 4px; border-radius:3px;">{{ sat }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="khoa-box {% if tinh_ban.tu_khoa[2].is_tuan_khong %}cung-tuan-khong{% endif %}">
+                <div class="khoa-title-khach">Khóa 3 (Đối Tác / Sự Việc)</div>
+                <p style="line-height: 1.4; margin-bottom: 5px;">
+                    Thiên <strong style="font-size: 18px;">{{ tinh_ban.tu_khoa[2].tren }}</strong> 
+                    {% if tinh_ban.tu_khoa[2].is_tuan_khong %}<span style="color: #e74c3c; font-size: 14px; font-weight: bold;" title="Không Vong (Trống Rỗng)">⭕</span>{% endif %}
+                    <span class="ngu-hanh-label">{{ tinh_ban.tu_khoa[2].ngu_hanh_tren_icon }}</span><br>
+                    <span style="font-size: 12px; color: #e74c3c;">{{ tinh_ban.tu_khoa[2].sinh_khac }}</span><br>
+                    Địa <strong>{{ tinh_ban.tu_khoa[2].duoi }}</strong> <span class="ngu-hanh-label">{{ tinh_ban.tu_khoa[2].ngu_hanh_duoi_icon }}</span>
+                </p>
+                <div style="font-size: 11px; border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; text-align: left; line-height: 1.5;">
+                    <span style="color: #c0392b; font-weight: bold; font-size: 13px;">{{ tinh_ban.tu_khoa[2].luc_than }}</span> • <strong>{{ tinh_ban.tu_khoa[2].vuong_suy }}</strong><br>
+                    <b>Thần/Tướng:</b> {{ tinh_ban.tu_khoa[2].tuong }} <small style="color:#7f8c8d;">({{ tinh_ban.tu_khoa[2].noi_ngoai_chien }})</small><br>
+                    <b>Vòng Đời 12 TS:</b> {{ tinh_ban.tu_khoa[2].truong_sinh }}<br>
+                    <b>Loại Thần:</b> {{ tinh_ban.tu_khoa[2].loai_than }} | <b>Trời Địa:</b> {{ tinh_ban.tu_khoa[2].thien_dia_chien }}<br>
+                    
+                    {% if tinh_ban.tu_khoa[2].don_can_quan_he %}
+                    <div style="margin-top: 3px; color: #9b59b6; font-weight: bold;">
+                        ĐỘN: {{ tinh_ban.tu_khoa[2].don_can }} ({{ tinh_ban.tu_khoa[2].don_can_luc_than }})
+                        <span style="color: #e67e22; font-size: 10px; font-weight: normal; display: block;">[{{ tinh_ban.tu_khoa[2].don_can_quan_he }}]</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if tinh_ban.tu_khoa[2].thai_tue %}<div style="color: #8e44ad; font-weight: bold; margin-top: 2px;">👑 {{ tinh_ban.tu_khoa[2].thai_tue }}</div>{% endif %}
+                    
+                    <div style="margin-top: 4px; display: flex; flex-wrap: wrap; gap: 2px;">
+                        {% if tinh_ban.tu_khoa[2].is_nhap_mo %}<span class="badge badge-nm" style="font-size:9px; padding:1px 4px; background:#7f8c8d; color:white; border-radius:3px;">NHẬP MỘ</span>{% endif %}
+                        {% if tinh_ban.tu_khoa[2].is_chiem_thoi %}<span class="badge badge-chiem-thoi" style="font-size:9px; padding:1px 4px; background:#2980b9; color:white; border-radius:3px;">CHIÊM THỜI</span>{% endif %}
+                        {% if tinh_ban.tu_khoa[2].is_nguyet_tuong %}<span class="badge badge-nguyet-tuong" style="font-size:9px; padding:1px 4px; background:#f1c40f; color:black; border-radius:3px;">☀️ NGUYỆT TƯỚNG</span>{% endif %}
+                    </div>
+                    
+                    {% if tinh_ban.tu_khoa[2].than_sat %}
+                    <div style="margin-top: 5px; display: flex; flex-wrap: wrap; gap: 2px;">
+                        {% for sat in tinh_ban.tu_khoa[2].than_sat %}
+                            <span class="tag-sat {% if sat in ['Thiên Đức (Giải Cứu)', 'Nguyệt Đức (Giải Cứu)', 'Thiên Y (Thần Y)', 'Thiên Mã', 'Thiên Lộc'] %}tag-cat-sat{% else %}tag-hung-sat{% endif %}" style="font-size: 9px; padding: 1px 4px; border-radius:3px;">{{ sat }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="khoa-box {% if tinh_ban.tu_khoa[1].is_tuan_khong %}cung-tuan-khong{% endif %}">
+                <div class="khoa-title-ta">Khóa 2 (Sân sau của Ta)</div>
+                <p style="line-height: 1.4; margin-bottom: 5px;">
+                    Thiên <strong style="font-size: 18px;">{{ tinh_ban.tu_khoa[1].tren }}</strong> 
+                    {% if tinh_ban.tu_khoa[1].is_tuan_khong %}<span style="color: #e74c3c; font-size: 14px; font-weight: bold;" title="Không Vong (Trống Rỗng)">⭕</span>{% endif %}
+                    <span class="ngu-hanh-label">{{ tinh_ban.tu_khoa[1].ngu_hanh_tren_icon }}</span><br>
+                    <span style="font-size: 12px; color: #e74c3c;">{{ tinh_ban.tu_khoa[1].sinh_khac }}</span><br>
+                    Địa <strong>{{ tinh_ban.tu_khoa[1].duoi }}</strong> <span class="ngu-hanh-label">{{ tinh_ban.tu_khoa[1].ngu_hanh_duoi_icon }}</span>
+                </p>
+                <div style="font-size: 11px; border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; text-align: left; line-height: 1.5;">
+                    <span style="color: #c0392b; font-weight: bold; font-size: 13px;">{{ tinh_ban.tu_khoa[1].luc_than }}</span> • <strong>{{ tinh_ban.tu_khoa[1].vuong_suy }}</strong><br>
+                    <b>Thần/Tướng:</b> {{ tinh_ban.tu_khoa[1].tuong }} <small style="color:#7f8c8d;">({{ tinh_ban.tu_khoa[1].noi_ngoai_chien }})</small><br>
+                    <b>Vòng Đời 12 TS:</b> {{ tinh_ban.tu_khoa[1].truong_sinh }}<br>
+                    <b>Loại Thần:</b> {{ tinh_ban.tu_khoa[1].loai_than }} | <b>Trời Địa:</b> {{ tinh_ban.tu_khoa[1].thien_dia_chien }}<br>
+                    
+                    {% if tinh_ban.tu_khoa[1].don_can_quan_he %}
+                    <div style="margin-top: 3px; color: #9b59b6; font-weight: bold;">
+                        ĐỘN: {{ tinh_ban.tu_khoa[1].don_can }} ({{ tinh_ban.tu_khoa[1].don_can_luc_than }})
+                        <span style="color: #e67e22; font-size: 10px; font-weight: normal; display: block;">[{{ tinh_ban.tu_khoa[1].don_can_quan_he }}]</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if tinh_ban.tu_khoa[1].thai_tue %}<div style="color: #8e44ad; font-weight: bold; margin-top: 2px;">👑 {{ tinh_ban.tu_khoa[1].thai_tue }}</div>{% endif %}
+                    
+                    <div style="margin-top: 4px; display: flex; flex-wrap: wrap; gap: 2px;">
+                        {% if tinh_ban.tu_khoa[1].is_nhap_mo %}<span class="badge badge-nm" style="font-size:9px; padding:1px 4px; background:#7f8c8d; color:white; border-radius:3px;">NHẬP MỘ</span>{% endif %}
+                        {% if tinh_ban.tu_khoa[1].is_chiem_thoi %}<span class="badge badge-chiem-thoi" style="font-size:9px; padding:1px 4px; background:#2980b9; color:white; border-radius:3px;">CHIÊM THỜI</span>{% endif %}
+                        {% if tinh_ban.tu_khoa[1].is_nguyet_tuong %}<span class="badge badge-nguyet-tuong" style="font-size:9px; padding:1px 4px; background:#f1c40f; color:black; border-radius:3px;">☀️ NGUYỆT TƯỚNG</span>{% endif %}
+                    </div>
+                    
+                    {% if tinh_ban.tu_khoa[1].than_sat %}
+                    <div style="margin-top: 5px; display: flex; flex-wrap: wrap; gap: 2px;">
+                        {% for sat in tinh_ban.tu_khoa[1].than_sat %}
+                            <span class="tag-sat {% if sat in ['Thiên Đức (Giải Cứu)', 'Nguyệt Đức (Giải Cứu)', 'Thiên Y (Thần Y)', 'Thiên Mã', 'Thiên Lộc'] %}tag-cat-sat{% else %}tag-hung-sat{% endif %}" style="font-size: 9px; padding: 1px 4px; border-radius:3px;">{{ sat }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="khoa-box {% if tinh_ban.tu_khoa[0].is_tuan_khong %}cung-tuan-khong{% endif %}">
+                <div class="khoa-title-ta">Khóa 1 (Ta / Bản Thân)</div>
+                <p style="line-height: 1.4; margin-bottom: 5px;">
+                    Thiên <strong style="font-size: 18px;">{{ tinh_ban.tu_khoa[0].tren }}</strong> 
+                    {% if tinh_ban.tu_khoa[0].is_tuan_khong %}<span style="color: #e74c3c; font-size: 14px; font-weight: bold;" title="Không Vong (Trống Rỗng)">⭕</span>{% endif %}
+                    <span class="ngu-hanh-label">{{ tinh_ban.tu_khoa[0].ngu_hanh_tren_icon }}</span><br>
+                    <span style="font-size: 12px; color: #e74c3c;">{{ tinh_ban.tu_khoa[0].sinh_khac }}</span><br>
+                    Can <strong>{{ tinh_ban.tu_khoa[0].duoi }}</strong> <span class="ngu-hanh-label">{{ tinh_ban.tu_khoa[0].ngu_hanh_duoi_icon }}</span>
+                </p>
+                <div style="font-size: 11px; border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; text-align: left; line-height: 1.5;">
+                    <span style="color: #c0392b; font-weight: bold; font-size: 13px;">{{ tinh_ban.tu_khoa[0].luc_than }}</span> • <strong>{{ tinh_ban.tu_khoa[0].vuong_suy }}</strong><br>
+                    <b>Thần/Tướng:</b> {{ tinh_ban.tu_khoa[0].tuong }} <small style="color:#7f8c8d;">({{ tinh_ban.tu_khoa[0].noi_ngoai_chien }})</small><br>
+                    <b>Vòng Đời 12 TS:</b> {{ tinh_ban.tu_khoa[0].truong_sinh }}<br>
+                    <b>Loại Thần:</b> {{ tinh_ban.tu_khoa[0].loai_than }} | <b>Trời Địa:</b> {{ tinh_ban.tu_khoa[0].thien_dia_chien }}<br>
+                    
+                    {% if tinh_ban.tu_khoa[0].don_can_quan_he %}
+                    <div style="margin-top: 3px; color: #9b59b6; font-weight: bold;">
+                        ĐỘN: {{ tinh_ban.tu_khoa[0].don_can }} ({{ tinh_ban.tu_khoa[0].don_can_luc_than }})
+                        <span style="color: #e67e22; font-size: 10px; font-weight: normal; display: block;">[{{ tinh_ban.tu_khoa[0].don_can_quan_he }}]</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if tinh_ban.tu_khoa[0].thai_tue %}<div style="color: #8e44ad; font-weight: bold; margin-top: 2px;">👑 {{ tinh_ban.tu_khoa[0].thai_tue }}</div>{% endif %}
+                    
+                    <div style="margin-top: 4px; display: flex; flex-wrap: wrap; gap: 2px;">
+                        {% if tinh_ban.tu_khoa[0].is_nhap_mo %}<span class="badge badge-nm" style="font-size:9px; padding:1px 4px; background:#7f8c8d; color:white; border-radius:3px;">NHẬP MỘ</span>{% endif %}
+                        {% if tinh_ban.tu_khoa[0].is_chiem_thoi %}<span class="badge badge-chiem-thoi" style="font-size:9px; padding:1px 4px; background:#2980b9; color:white; border-radius:3px;">CHIÊM THỜI</span>{% endif %}
+                        {% if tinh_ban.tu_khoa[0].is_nguyet_tuong %}<span class="badge badge-nguyet-tuong" style="font-size:9px; padding:1px 4px; background:#f1c40f; color:black; border-radius:3px;">☀️ NGUYỆT TƯỚNG</span>{% endif %}
+                    </div>
+                    
+                    {% if tinh_ban.tu_khoa[0].than_sat %}
+                    <div style="margin-top: 5px; display: flex; flex-wrap: wrap; gap: 2px;">
+                        {% for sat in tinh_ban.tu_khoa[0].than_sat %}
+                            <span class="tag-sat {% if sat in ['Thiên Đức (Giải Cứu)', 'Nguyệt Đức (Giải Cứu)', 'Thiên Y (Thần Y)', 'Thiên Mã', 'Thiên Lộc'] %}tag-cat-sat{% else %}tag-hung-sat{% endif %}" style="font-size: 9px; padding: 1px 4px; border-radius:3px;">{{ sat }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="analysis-box analysis-dong-luc">
+            <h4 style="margin-top: 0; color: #2c3e50;">🤝 ĐỘNG LỰC HỌC TỨ KHÓA (Nghệ thuật đàm phán)</h4>
+            <p style="margin-bottom: 5px;"><strong>1. QUÉT NGANG (Bề nổi - Khóa 1 đấu Khóa 3):</strong> <br><span style="color: #2980b9;">{{ tinh_ban.dong_luc_hoc.quet_ngang }}</span></p>
+            
+            <p style="margin-bottom: 5px; margin-top: 10px;"><strong>2. QUÉT DỌC (Đọc vị Nội bộ):</strong></p>
+            <ul style="margin-top: 0; padding-left: 20px; font-size: 14px;">
+                <li><strong>Phe Ta (Khóa 1 & 2):</strong> <span class="{% if 'TỰ KHẮC' in tinh_ban.dong_luc_hoc.noi_bo_ta %}highlight-sat{% else %}text-muted{% endif %}">{{ tinh_ban.dong_luc_hoc.noi_bo_ta }}</span></li>
+                <li><strong>Phe Khách (Khóa 3 & 4):</strong> <span class="{% if 'TỰ KHẮC' in tinh_ban.dong_luc_hoc.noi_bo_khach %}highlight-sat{% else %}text-muted{% endif %}">{{ tinh_ban.dong_luc_hoc.noi_bo_khach }}</span></li>
+            </ul>
+
+            <p style="margin-bottom: 5px; margin-top: 10px;"><strong>3. QUÉT CHÉO (Thế trận Giao Xa - Mưu đồ ngầm):</strong></p>
+            <ul style="margin-top: 0; padding-left: 20px; font-size: 14px;">
+                <li>{{ tinh_ban.dong_luc_hoc.k1_k4 }}</li>
+                <li>{{ tinh_ban.dong_luc_hoc.k3_k2 }}</li>
+            </ul>
+            <div style="background-color: #fdf2e9; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                <strong>🔥 KẾT LUẬN GIAO XA:</strong> <span style="color: #c0392b; font-weight: bold;">{{ tinh_ban.dong_luc_hoc.giao_xa_ket_luan }}</span>
+            </div>
+        </div>
+    </div>
+
+    {% if tinh_ban.khong_vong_msg %}
+    <div class="analysis-box" style="background: #fdf2e9; border-left: 5px solid #e74c3c; margin-bottom: 25px;">
+        <strong style="color: #c0392b; font-size: 16px;">⭕ ĐỌC VỊ KHÔNG VONG (SỰ TRỐNG RỖNG):</strong><br>
+        <ul style="margin: 5px 0 0 20px; padding: 0; font-size: 14px; color: #2c3e50;">
+            {% for msg in tinh_ban.khong_vong_msg %}
+            <li>{{ msg }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    
+    <div class="card">
+        <h2>* TAM TRUYỀN (BƯỚC 2: Trục Nhân Quả & Sự việc)</h2>
+        
+        <div class="cuu-tong-mon-box">
+            <div>
+                <strong style="color: #2c3e50; font-size: 15px;">🚪 CỬU TÔNG MÔN (Cửa khởi nguồn):</strong> 
+                Căn cứ vào Mâu Thuẫn Tứ Khóa, quẻ này phát động từ cửa: <span style="color: #c0392b; font-weight: bold; font-size: 16px; text-transform: uppercase;">{{ tinh_ban.cuu_tong_mon }}</span>
+            </div>
+        </div>
+
+        <div class="truyen-container" style="display: flex; gap: 15px; justify-content: space-between; flex-wrap: wrap;">
+            {% set t_steps = [("so", "Sơ Truyền (Khởi đầu)"), ("trung", "Trung Truyền (Diễn biến)"), ("mat", "Mạt Truyền (Kết cục)")] %}
+            {% for key, t_name in t_steps %}
+            {% set t_data = tinh_ban.tam_truyen[key] %}
+            <div class="truyen-box" style="flex: 1; min-width: 250px; position: relative;">
+                <h4>{{ t_name }}</h4>
+                <p style="font-size: 22px; font-weight: bold; margin: 5px 0;">
+                    Chi {{ t_data.chi }} 
+                    {% if t_data.is_tuan_khong %}<span style="color: #e74c3c; font-size: 16px;" title="Không Vong">⭕</span>{% endif %}
+                    <span class="ngu-hanh-label" style="font-size: 13px;">{{ t_data.ngu_hanh_chi_icon }}</span>
+                </p>
+                
+                <div style="font-size: 12px; text-align: left; padding: 8px; background-color: #f8f9fa; border-radius: 4px; border-left: 3px solid #3498db; margin-bottom: 10px; line-height: 1.5;">
+                    <span style="color:#c0392b; font-weight:bold; font-size: 13px;">{{ t_data.luc_than }}</span> • Khí Mùa: <strong>{{ t_data.vuong_suy }}</strong><br>
+                    <b>Thần/Tướng:</b> {{ t_data.tuong }} <small style="color:#7f8c8d;">({{ t_data.noi_ngoai_chien }})</small><br>
+                    <b>Vòng Đời 12 TS:</b> {{ t_data.truong_sinh }}<br>
+                    <b>Loại Thần:</b> {{ t_data.loai_than }} | <b>Trời Địa:</b> {{ t_data.thien_dia_chien }}<br>
+                    
+                    {% if t_data.thai_tue %}<div style="color:#8e44ad; font-weight:bold; margin-top:2px;">👑 {{ t_data.thai_tue }}</div>{% endif %}
+                    
+                    <div style="margin-top: 5px; display: flex; flex-wrap: wrap; gap: 3px;">
+                        {% if t_data.is_nhap_mo %}<span class="badge badge-nm" style="font-size:9px; padding:2px 5px; background:#7f8c8d; color:white; border-radius:3px;">NHẬP MỘ</span>{% endif %}
+                        {% if t_data.is_chiem_thoi %}<span class="badge badge-chiem-thoi" style="font-size:9px; padding:2px 5px; background:#2980b9; color:white; border-radius:3px;">CHIÊM THỜI</span>{% endif %}
+                        {% if t_data.is_nguyet_tuong %}<span class="badge badge-nguyet-tuong" style="font-size:9px; padding:2px 5px; background:#f1c40f; color:black; border-radius:3px;">☀️ NGUYỆT TƯỚNG</span>{% endif %}
+                    </div>
+                    
+                    {% if t_data.than_sat %}
+                    <div style="margin-top: 5px; display: flex; flex-wrap: wrap; gap: 3px;">
+                        {% for sat in t_data.than_sat %}
+                            <span class="tag-sat {% if sat in ['Thiên Đức (Giải Cứu)', 'Nguyệt Đức (Giải Cứu)', 'Thiên Y (Thần Y)', 'Thiên Mã', 'Thiên Lộc'] %}tag-cat-sat{% else %}tag-hung-sat{% endif %}" style="font-size: 9px; padding: 2px 5px; border-radius:3px;">{{ sat }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% if t_data.is_tuan_khong %}
+                <div style="background-color: #fdedec; border: 1px dashed #e74c3c; padding: 6px; margin-top: 6px; border-radius: 4px; font-size: 11px; text-align: left;">
+                    <strong style="color: #c0392b;">Lật thế cờ Không Vong:</strong><br>
+                    - {{ t_data.kv_tinh_chat.cat_hung }}<br>
+                    - {{ t_data.kv_tinh_chat.chan_gia }}
+                </div>
+                {% endif %}
+
+                <div class="tang-hinh-box" style="text-align: left; margin-top: 8px;">
+                    <strong>👁️ Góc khuất:</strong><br>
+                    Âm thần: {{ t_data.am_than }} <span style="color:#7f8c8d; font-size:11px; font-weight:bold;">[{{ t_data.ngu_hanh_am_than_icon }}]</span> ({{ t_data.am_than_tuong }} <span style="color:#7f8c8d; font-size:11px; font-weight:bold;">[{{ t_data.ngu_hanh_am_than_tuong_icon }}]</span>)<br>
+                    Độn can: {{ t_data.don_can }} {% if t_data.don_can != 'Không' %}({{ t_data.don_can_luc_than }} ➔ <span style="color:#d35400;">{{ t_data.don_can_quan_he }}</span>){% endif %}
+                </div>
+                
+                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dotted #bdc3c7; text-align: left;">
+                    <strong style="color: #2980b9;">⏳ Ứng Kỳ (Thời điểm):</strong><br>
+                    <ul style="margin: 3px 0 0 15px; padding: 0; font-size: 12px; color: #d35400;">
+                        {% for uk in t_data.ung_ky %}
+                            <li>{{ uk }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="analysis-box analysis-thoi-gian">
+            <strong>⏱️ Trục Vòng Đời Dự Án (Sơ Truyền ➔ Mạt Truyền):</strong>
+            {% if tinh_ban.tam_truyen.quan_he_so_mat %}
+                <span style="color: #d35400; font-weight: bold;">[ {{ tinh_ban.tam_truyen.quan_he_so_mat }} ]</span>
+            {% else %}
+                Tiến trình phát triển tự nhiên
+            {% endif %}
+            
+            {% if tinh_ban.tam_truyen.tien_thoai %}
+            <br><strong>🚀 Tốc độ & Xu hướng:</strong> <span style="color: #2980b9; font-weight: bold;">{{ tinh_ban.tam_truyen.tien_thoai }}</span>
+            {% endif %}
+
+            {% if tinh_ban.tam_truyen.cuc_dien %}
+            <br><strong>🔥 Cục Diện Toàn Trận:</strong> 
+            <span style="color: #e74c3c; font-weight: bold; font-size: 16px;">{{ tinh_ban.tam_truyen.cuc_dien | join(', ') }}</span>
+            {% endif %}
+            
+            <div style="background-color: #fdf2e9; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 4px solid #d35400;">
+                <strong style="color: #d35400;">⚔️ CHỐT HẠ THÀNH BẠI (Mạt Truyền so găng Can Ngày/TA):</strong><br>
+                <span style="font-weight: bold; color: #2c3e50;">{{ tinh_ban.tam_truyen.lat_keo_mat_can }}</span>
+            </div>
+        </div>
+
+        {% if tinh_ban.sinh_than %}
+        <div class="analysis-box analysis-lat-keo">
+            <strong style="color: #c0392b; font-size: 16px;">🛡️ LẬT KÈO BẢN MỆNH (Mạt Truyền so găng Năm Sinh):</strong><br>
+            <span style="font-weight: bold; color: #2c3e50;">{{ tinh_ban.sinh_than.lat_keo }}</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>* THIÊN ĐỊA BÀN (Bản Đồ Không Gian Đa Lớp)</h2>
+        <div class="astrolabe-grid">
+            <div class="astrolabe-center">
+                <div style="font-weight: 900; color: var(--primary-color); font-size: 18px; margin-bottom: 15px; letter-spacing: 1px; text-transform: uppercase;">THIÊN ĐỊA BÀN</div>
+                
+                <svg viewBox="0 0 200 190" width="100%" height="100%" style="max-height: 280px; max-width: 280px; margin-top: 5px; filter: drop-shadow(0px 4px 4px rgba(0,0,0,0.05));">
+                    <defs>
+                        <marker id="arrow-sinh" viewBox="0 0 10 10" refX="28" refY="5" markerWidth="6" markerHeight="6" orient="auto" markerUnits="userSpaceOnUse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#2ecc71"/>
+                        </marker>
+                        <marker id="arrow-khac" viewBox="0 0 10 10" refX="28" refY="5" markerWidth="6" markerHeight="6" orient="auto" markerUnits="userSpaceOnUse">
+                            <path d="M 0 0 L 10 5 L 0 10 z" fill="#e74c3c"/>
+                        </marker>
+                    </defs>
+                    
+                    <g stroke="#2ecc71" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-sinh)">
+                        <line x1="100" y1="40" x2="157" y2="81" />
+                        <line x1="157" y1="81" x2="135" y2="148" />
+                        <line x1="135" y1="148" x2="65" y2="148" />
+                        <line x1="65" y1="148" x2="43" y2="81" />
+                        <line x1="43" y1="81" x2="100" y2="40" />
+                    </g>
+                    
+                    <g stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow-khac)">
+                        <line x1="100" y1="40" x2="135" y2="148" />
+                        <line x1="135" y1="148" x2="43" y2="81" />
+                        <line x1="43" y1="81" x2="157" y2="81" />
+                        <line x1="157" y1="81" x2="65" y2="148" />
+                        <line x1="65" y1="148" x2="100" y2="40" />
+                    </g>
+
+                    <g font-size="12" font-weight="bold">
+                        <rect x="75" y="28" width="50" height="24" rx="6" fill="#fdedec" stroke="#c0392b" stroke-width="1.5"/>
+                        <text x="100" y="44" fill="#c0392b" text-anchor="middle">🔥 Hỏa</text>
+                        
+                        <rect x="134" y="69" width="50" height="24" rx="6" fill="#fdf2e9" stroke="#d35400" stroke-width="1.5"/>
+                        <text x="159" y="85" fill="#d35400" text-anchor="middle">⛰️ Thổ</text>
+                        
+                        <rect x="110" y="136" width="50" height="24" rx="6" fill="#f4f6f7" stroke="#7f8c8d" stroke-width="1.5"/>
+                        <text x="135" y="152" fill="#7f8c8d" text-anchor="middle">⚔️ Kim</text>
+                        
+                        <rect x="40" y="136" width="50" height="24" rx="6" fill="#ebf5fb" stroke="#2980b9" stroke-width="1.5"/>
+                        <text x="65" y="152" fill="#2980b9" text-anchor="middle">💧 Thủy</text>
+                        
+                        <rect x="16" y="69" width="50" height="24" rx="6" fill="#eafaf1" stroke="#27ae60" stroke-width="1.5"/>
+                        <text x="41" y="85" fill="#27ae60" text-anchor="middle">🌳 Mộc</text>
+                    </g>
+
+                    <text x="100" y="103" font-size="11" font-weight="bold" fill="#2ecc71" text-anchor="middle">Vòng: Sinh</text>
+                    <text x="100" y="119" font-size="11" font-weight="bold" fill="#e74c3c" text-anchor="middle">Sao: Khắc</text>
+                </svg>
+            </div>
+            {% for cung in tinh_ban.thien_dia_ban %}
+            
+            {% set is_target = false %}
+            {% set target_name = "" %}
+            
+            {% if tinh_ban.nhom_van_de == 'kinh_doanh' and cung.luc_than in ['Thê Tài', 'Tử Tôn'] %}
+                {% set is_target = true %}{% set target_name = "🎯 MỤC TIÊU TIỀN TÀI" %}
+            {% elif tinh_ban.nhom_van_de == 'thi_cu' and cung.luc_than in ['Quan Quỷ', 'Phụ Mẫu'] %}
+                {% set is_target = true %}{% set target_name = "🎯 MỤC TIÊU CÔNG DANH" %}
+            {% elif tinh_ban.nhom_van_de == 'tinh_duyen' and (cung.luc_than in ['Thê Tài', 'Quan Quỷ'] or cung.tuong in ['Lục Hợp', 'Thiên Hậu'] or 'Đào Hoa' in cung.than_sat) %}
+                {% set is_target = true %}{% set target_name = "🎯 MỤC TIÊU NHÂN DUYÊN" %}
+            {% elif tinh_ban.nhom_van_de == 'benh_tat' and (cung.luc_than in ['Quan Quỷ', 'Tử Tôn'] or cung.tuong == 'Bạch Hổ' or 'Thiên Y (Thần Y)' in cung.than_sat) %}
+                {% set is_target = true %}{% set target_name = "🎯 MỤC TIÊU CHẨN BỆNH" %}
+            {% elif tinh_ban.nhom_van_de == 'kien_tung' and (cung.luc_than in ['Quan Quỷ', 'Phụ Mẫu'] or cung.tuong == 'Chu Tước') %}
+                {% set is_target = true %}{% set target_name = "🎯 MỤC TIÊU PHÁP LÝ" %}
+            {% elif tinh_ban.nhom_van_de == 'mat_trom' and (cung.luc_than == 'Thê Tài' or cung.tuong == 'Huyền Vũ') %}
+                {% set is_target = true %}{% set target_name = "🎯 MỤC TIÊU TÌM ĐỒ" %}
+            {% elif tinh_ban.nhom_van_de == 'phong_thuy' and (cung.luc_than == 'Phụ Mẫu' or cung.tuong == 'Đằng Xà') %}
+                {% set is_target = true %}{% set target_name = "🎯 MỤC TIÊU GIA TRẠCH" %}
+            {% endif %}
+
+            <div class="palace cung-{{ cung.dia }} {% if cung.is_tuan_khong %}cung-tuan-khong{% endif %} {% if is_target %}target-palace{% endif %}">
+                {% if is_target %}<div class="target-label">{{ target_name }}</div>{% endif %}
+                <div class="palace-dia">{{ cung.dia }} <span style="font-size: 14px; font-weight: bold; color: #d35400;">[{{ cung.ngu_hanh_dia }}]</span></div>
+                <div class="palace-content">
+                    <div class="palace-tuong">
+                        {# --- XỬ LÝ MÀU SẮC (Thêm dấu gạch ngang để loại bỏ khoảng trắng HTML thừa) --- #}
+                        {%- set tuong_color = '#f1c40f' -%}
+                        {%- if cung.tuong in ['Quý Nhân', 'Thanh Long', 'Lục Hợp', 'Thái Thường', 'Thái Âm', 'Thiên Hậu'] -%}
+                            {%- set tuong_color = '#27ae60' -%}
+                        {%- elif cung.tuong in ['Bạch Hổ', 'Câu Trần', 'Chu Tước', 'Đằng Xà', 'Huyền Vũ', 'Thiên Không'] -%}
+                            {%- set tuong_color = '#e74c3c' -%}
+                        {%- endif -%}
+
+                        {# --- GOM CHẤM MÀU VÀ CHỮ VÀO FLEXBOX ĐỂ ÉP THẲNG HÀNG --- #}
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 2px;">
+                            <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background-color: {{ tuong_color }}; box-shadow: 0 1px 2px rgba(0,0,0,0.2);" title="{% if tuong_color == '#27ae60' %}Thiên Tướng Lành{% elif tuong_color == '#e74c3c' %}Thiên Tướng Dữ{% else %}Thiên Tướng Trung Tính{% endif %}"></span>
+                            <span>{{ cung.tuong }}</span>
+                            <span style="font-size: 11px; font-weight:bold; color: #8e44ad;">[{{ cung.ngu_hanh_tuong }}]</span>
+                        </div>
+                        
+                        {# --- PHẦN NỘI CHIẾN / NGOẠI CHIẾN CŨ CỦA BẠN ĐƯỢC GIỮ NGUYÊN --- #}
+                        <div class="palace-chien" title="Tướng và Thần">
+                            T/Thần:
+                            {% if 'NỘI CHIẾN' in cung.tuong_than_chien %}<span style="color: #c0392b; font-weight: bold;">Nội chiến</span>
+                            {% elif 'NGOẠI CHIẾN' in cung.tuong_than_chien %}<span style="color: #e67e22; font-weight: bold;">Ngoại chiến</span>
+                            {% elif 'TƯƠNG SINH' in cung.tuong_than_chien %}<span style="color: #27ae60;">Tương sinh</span>
+                            {% else %}<span style="color: #7f8c8d;">Tỷ hòa</span>{% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="palace-thien">
+                        {{ cung.thien }} <span style="font-size: 13px; font-weight: bold; color: #2980b9;">[{{ cung.ngu_hanh_thien }}]</span>
+                    </div>
+                    
+                    <div class="palace-chien" style="margin-bottom: 2px;" title="Thiên Bàn và Địa Bàn">
+                        Trời/Đất:
+                        {% if 'NỘI CHIẾN' in cung.thien_dia_chien %}<span style="color: #c0392b; font-weight: bold;">Nội chiến</span>
+                        {% elif 'NGOẠI CHIẾN' in cung.thien_dia_chien %}<span style="color: #e67e22; font-weight: bold;">Ngoại chiến</span>
+                        {% elif 'TƯƠNG SINH' in cung.thien_dia_chien %}<span style="color: #27ae60;">Tương sinh</span>
+                        {% else %}<span style="color: #7f8c8d;">Tỷ hòa</span>{% endif %}
+                    </div>
+                    
+                    <div><span class="palace-khi">{{ cung.vuong_suy }}</span></div>
+                    
+                    <div class="palace-than" style="margin-top: 4px;">
+                        <span style="color: #c0392b; font-weight: 900; font-size: 13px;">{{ cung.luc_than }}</span> • {{ cung.loai_than }} <span class="palace-truong-sinh">• {{ cung.truong_sinh }}</span>
+                    </div>
+                    
+                    <div style="font-size: 10px; color: #9b59b6; font-weight: bold; margin-top: 2px; text-transform: uppercase;">
+                        ĐỘN: {{ cung.don_can }} {% if cung.don_can != 'Không' %}({{ cung.don_can_luc_than }}) <span style="color: #e67e22; font-size: 9px; text-transform: none; display: block;">[{{ cung.don_can_quan_he }}]</span>{% endif %}
+                    </div>
+
+                    <div class="badge-container">
+                        {% if cung.is_chiem_thoi %}<span class="badge badge-chiem-thoi" title="Nguồn cơn sự việc">CHIÊM THỜI</span>{% endif %}
+                        {% if cung.is_nguyet_tuong %}<span class="badge badge-nguyet-tuong" title="Mặt trời hóa giải">☀️ NGUYỆT TƯỚNG</span>{% endif %}
+                        {% if cung.is_ban_menh %}<span class="badge badge-ban-menh" title="Sinh mệnh người hỏi">👤 BẢN MỆNH</span>{% endif %}
+                        {% if cung.is_hanh_nien %}<span class="badge badge-hanh-nien" title="Vận hạn năm nay">🎯 HÀNH NIÊN</span>{% endif %}
+                        
+                        {% if cung.is_tuan_khong %}<span class="badge badge-tk">TUẦN KHÔNG</span>{% endif %}
+                        {% if cung.is_nhap_mo %}<span class="badge badge-nm">NHẬP MỘ</span>{% endif %}
+                    </div>
+                    
+                    {% if cung.thai_tue %}<div style="font-size: 11px; font-weight: bold; color: #8e44ad; margin-top: 2px;">{{ cung.thai_tue }}</div>{% endif %}
+                    
+                    {% if cung.than_sat %}
+                    <div class="palace-sat">
+                        {% for sat in cung.than_sat %}
+                            {% if sat in ['Thiên Mã', 'Thiên Lộc'] %}
+                                <span class="tag-sat tag-cat-sat">{{ sat }}</span>
+                            {% elif sat in ['Tuế Phá', 'Nguyệt Phá', 'Thiên Hình', 'Tai Sát', 'Kiếp Sát', 'Phá Toái', 'Đại Sát', 'Tiểu Sát'] %}
+                                <span class="tag-sat tag-hung-sat">{{ sat }}</span>
+                            {% elif sat == 'Đào Hoa' %}
+                                <span class="tag-sat tag-dao-hoa">{{ sat }}</span>
+                            {% elif sat in ['Thái Tuế', 'Nguyệt Kiến'] %}
+                                <span class="tag-sat tag-quyen-luc">{{ sat }}</span>
+                            {% else %}
+                                <span class="tag-sat tag-neutral">{{ sat }}</span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>* BẢNG TRA CỨU TỪ ĐIỂN LỤC NHÂM (Dành cho người xem)</h2>
+        <details>
+            <summary>📖 1. Phân loại 12 Thiên Tướng (Cát / Hung & Đặc tính)</summary>
+            <table class="ref-table">
+                <thead><tr><th>Thiên Tướng</th><th>Ngũ Hành</th><th>Nhóm</th><th>Ý Nghĩa / Đặc Tính Nổi Bật</th></tr></thead>
+                <tbody>
+                    <tr><td><strong>Quý Nhân</strong></td><td class="element-tho">Thổ</td><td><span class="tag-cat">CÁT</span></td><td>Cứu giải tai ách, có người bề trên che chở, công danh hanh thông.</td></tr>
+                    <tr><td><strong>Thanh Long</strong></td><td class="element-moc">Mộc</td><td><span class="tag-cat">CÁT</span></td><td>Tài lộc, tin vui, thăng tiến, chuyển nhà, hôn nhân, mang thai tốt.</td></tr>
+                    <tr><td><strong>Lục Hợp</strong></td><td class="element-moc">Mộc</td><td><span class="tag-cat">CÁT</span></td><td>Hợp tác, hôn nhân, môi giới, gặp gỡ. (Xấu nếu đang muốn ly hôn/nghỉ việc vì sẽ bị níu kéo).</td></tr>
+                    <tr><td><strong>Thái Thường</strong></td><td class="element-tho">Thổ</td><td><span class="tag-cat">CÁT</span></td><td>Tiệc tùng, y phục, quà tặng, lương thực, tài sản vật chất thực tế.</td></tr>
+                    <tr><td><strong>Thái Âm</strong></td><td class="element-kim">Kim</td><td><span class="tag-cat">CÁT</span></td><td>Sự che chở ngầm, mưu trí kín đáo, phụ nữ, âm tín (tin nhắn ngầm).</td></tr>
+                    <tr><td><strong>Thiên Hậu</strong></td><td class="element-thuy">Thủy</td><td><span class="tag-cat">CÁT</span></td><td>Ân trạch, người vợ, tình cảm êm ấm, sự bao dung và thủy chung.</td></tr>
+                    <tr><td><strong>Bạch Hổ</strong></td><td class="element-kim">Kim</td><td><span class="tag-hung">HUNG</span></td><td>Tai nạn, huyết quang (máu me), bạo lực, tang tóc, bệnh tật trở nặng.</td></tr>
+                    <tr><td><strong>Câu Trần</strong></td><td class="element-tho">Thổ</td><td><span class="tag-hung">HUNG</span></td><td>Trì trệ, vướng bận, tranh chấp đất đai, kiện cáo, cảnh sát/pháp luật.</td></tr>
+                    <tr><td><strong>Chu Tước</strong></td><td class="element-hoa">Hỏa</td><td><span class="tag-hung">HUNG</span></td><td>Cãi vã, thị phi, khẩu thiệt, hỏa hoạn. (Tuy nhiên nếu xem thi cử/thư từ thì lại là tin tức tới).</td></tr>
+                    <tr><td><strong>Đằng Xà</strong></td><td class="element-hoa">Hỏa</td><td><span class="tag-hung">HUNG</span></td><td>Sợ hãi, quái dị, bồn chồn, ác mộng, tiểu nhân hãm hại giật dây.</td></tr>
+                    <tr><td><strong>Huyền Vũ</strong></td><td class="element-thuy">Thủy</td><td><span class="tag-hung">HUNG</span></td><td>Trộm cắp, mất đồ, lừa đảo, hao tài tốn của, chuyện mờ ám vỡ lở.</td></tr>
+                    <tr><td><strong>Thiên Không</strong></td><td class="element-tho">Thổ</td><td><span class="tag-hung">HUNG</span></td><td>Hư ảo, trống rỗng, lừa gạt, thất hứa. Làm việc gì cũng tốn công vô ích.</td></tr>
+                </tbody>
+            </table>
+        </details>
+        
+        <details>
+            <summary>🗡️ 2. Bí quyết đọc vị mưu đồ (Sinh/Khắc giữa TƯỚNG và THẦN)</summary>
+            <p><strong>Thiên Tướng</strong> (Lớp Đỉnh) cưỡi trên lưng <strong>Thiên Bàn/Thần</strong> (Lớp Giữa). So sánh Ngũ hành của chúng ta sẽ biết hiện tượng đó là thật hay giả:</p>
+            <ul>
+                <li><strong>TƯƠNG SINH (Hòa hợp):</strong> Sự việc trọn vẹn, thật lòng. (Cát thần gặp Tương sinh là Đại Cát. Hung thần gặp Tương sinh là Đại Hung vì ác quỷ được cấp vũ khí).</li>
+                <li><strong>NỘI CHIẾN (Thần khắc Tướng):</strong> Gốc đâm Ngọn. Vẻ ngoài đẹp đẽ (Tướng) nhưng bên trong gài bẫy (Thần). <em>Ví dụ:</em> Thấy Thanh Long (Tiền bạc) bị Nội chiến gọi là "Rồng gãy chân" (Tiền lừa đảo). Thấy Bạch Hổ (Tai ương) bị Nội chiến gọi là "Hổ rụng răng" (Dọa dẫm không đáng sợ).</li>
+                <li><strong>NGOẠI CHIẾN (Tướng khắc Thần):</strong> Ngọn đè Gốc. Tai họa từ bên ngoài giáng xuống bất ngờ khiến bản thân không kịp trở tay.</li>
+                <li><strong>TỶ HÒA:</strong> Bản chất rõ ràng, không mưu đồ. Cộng hưởng sức mạnh (Cát càng Cát, Hung càng Hung).</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>🌍 3. Phân tích hoàn cảnh, môi trường (Sinh/Khắc THIÊN BÀN vs ĐỊA BÀN)</summary>
+            <p><strong>Thiên Bàn</strong> (Lớp Động - Khách/Bầu trời) giáng xuống <strong>Địa Bàn</strong> (Lớp Tĩnh - Chủ/Mặt đất). Nó cho ta biết Môi trường xung quanh có đang ủng hộ diễn biến đó hay không:</p>
+            <ul>
+                <li><strong>TƯƠNG SINH (Trời Đất hòa hợp):</strong> Thời cơ thuận lợi, hoàn cảnh và nền tảng hỗ trợ đắc lực cho sự việc. Bạn đang đứng ở đúng nơi, đúng lúc.</li>
+                <li><strong>NỘI CHIẾN (Địa Bàn khắc Thiên Bàn - Gốc đâm Ngọn):</strong> Nội bộ công ty cản trở, hoặc bản thân bảo thủ dùng cách cũ chống lại xu hướng mới. Môi trường chống lại bạn.</li>
+                <li><strong>NGOẠI CHIẾN (Thiên Bàn khắc Địa Bàn - Ngọn đè Gốc):</strong> Biến cố bất ngờ từ ngoại cảnh (thị trường sập, thiên tai, sếp giáng đòn) đập nát nền tảng cố định. Trạng thái bị động.</li>
+                <li><strong>TỶ HÒA:</strong> Nền tảng bình ổn, môi trường không gây cản trở cũng không có thay đổi bất ngờ.</li>
+            </ul>
+        </details>
+        
+        <details>
+            <summary>☯️ 4. Quy luật Tương Sinh / Tương Khắc (Ngũ Hành)</summary>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px;">
+                <div style="flex: 1; min-width: 300px; background: #eafaf1; padding: 15px; border-radius: 6px; border: 1px solid #2ecc71;">
+                    <h4 style="margin-top: 0; color: #27ae60;">VÒNG TƯƠNG SINH (Sinh Sôi, Trợ Lực)</h4>
+                    <p><strong class="element-moc">Mộc</strong> ➔ sinh ➔ <strong class="element-hoa">Hỏa</strong> (Củi đốt sinh Lửa)</p>
+                    <p><strong class="element-hoa">Hỏa</strong> ➔ sinh ➔ <strong class="element-tho">Thổ</strong> (Lửa thiêu ra Tro đất)</p>
+                    <p><strong class="element-tho">Thổ</strong> ➔ sinh ➔ <strong class="element-kim">Kim</strong> (Đất sinh ra Quặng kim loại)</p>
+                    <p><strong class="element-kim">Kim</strong> ➔ sinh ➔ <strong class="element-thuy">Thủy</strong> (Kim loại nung chảy ra Nước)</p>
+                    <p><strong class="element-thuy">Thủy</strong> ➔ sinh ➔ <strong class="element-moc">Mộc</strong> (Nước nuôi dưỡng Cây)</p>
+                </div>
+                <div style="flex: 1; min-width: 300px; background: #fdedec; padding: 15px; border-radius: 6px; border: 1px solid #e74c3c;">
+                    <h4 style="margin-top: 0; color: #c0392b;">VÒNG TƯƠNG KHẮC (Triệt Tiêu, Kìm Hãm)</h4>
+                    <p><strong class="element-moc">Mộc</strong> ➔ khắc ➔ <strong class="element-tho">Thổ</strong> (Rễ cây hút chất Đất)</p>
+                    <p><strong class="element-tho">Thổ</strong> ➔ khắc ➔ <strong class="element-thuy">Thủy</strong> (Đất đắp đê ngăn Nước)</p>
+                    <p><strong class="element-thuy">Thủy</strong> ➔ khắc ➔ <strong class="element-hoa">Hỏa</strong> (Nước dập tắt Lửa)</p>
+                    <p><strong class="element-hoa">Hỏa</strong> ➔ khắc ➔ <strong class="element-kim">Kim</strong> (Lửa nung chảy Kim loại)</p>
+                    <p><strong class="element-kim">Kim</strong> ➔ khắc ➔ <strong class="element-moc">Mộc</strong> (Rìu/Cưa chặt đứt Cây)</p>
+                </div>
+            </div>
+        </details>
+
+        <details>
+            <summary>⚙️ 5. Phân bổ Ngũ Hành của Thiên Can & Địa Chi</summary>
+            <table class="ref-table">
+                <thead>
+                    <tr>
+                        <th>Ngũ Hành</th>
+                        <th>10 Thiên Can</th>
+                        <th>12 Địa Chi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="element-moc"><strong>MỘC</strong></td>
+                        <td>Giáp (+ Dương), Ất (- Âm)</td>
+                        <td>Dần (+ Dương), Mão (- Âm)</td>
+                    </tr>
+                    <tr>
+                        <td class="element-hoa"><strong>HỎA</strong></td>
+                        <td>Bính (+ Dương), Đinh (- Âm)</td>
+                        <td>Tỵ (- Âm), Ngọ (+ Dương)</td>
+                    </tr>
+                    <tr>
+                        <td class="element-tho"><strong>THỔ</strong></td>
+                        <td>Mậu (+ Dương), Kỷ (- Âm)</td>
+                        <td>Thìn (+), Tuất (+), Sửu (-), Mùi (-)</td>
+                    </tr>
+                    <tr>
+                        <td class="element-kim"><strong>KIM</strong></td>
+                        <td>Canh (+ Dương), Tân (- Âm)</td>
+                        <td>Thân (+ Dương), Dậu (- Âm)</td>
+                    </tr>
+                    <tr>
+                        <td class="element-thuy"><strong>THỦY</strong></td>
+                        <td>Nhâm (+ Dương), Quý (- Âm)</td>
+                        <td>Hợi (- Âm), Tý (+ Dương)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </details>
+
+        <details>
+            <summary>⚔️ 6. Tương Quan Lực Lượng 12 Địa Chi (Hợp, Xung, Hình, Hại, Phá)</summary>
+            <table class="ref-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Loại Hình</th>
+                        <th style="width: 45%;">Các Cặp / Bộ</th>
+                        <th>Ý Nghĩa Thực Chiến</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Lục Hợp</strong><br><span class="tag-cat">Gắn kết</span></td>
+                        <td>Tý-Sửu, Dần-Hợi, Mão-Tuất, Thìn-Dậu, Tỵ-Thân, Ngọ-Mùi</td>
+                        <td>Sự đồng thuận, hợp tác, kết giao. Nếu muốn chia ly/nghỉ việc thì lại thành mắc kẹt, dây dưa không dứt.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tam Hợp</strong><br><span class="tag-cat">Đồng minh</span></td>
+                        <td>Dần-Ngọ-Tuất (Hỏa), Hợi-Mão-Mùi (Mộc), Thân-Tý-Thìn (Thủy), Tỵ-Dậu-Sửu (Kim)</td>
+                        <td>Sức mạnh tập thể, có đội nhóm hùng hậu, công ty lớn. Cục diện được mở rộng quy mô.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lục Xung</strong><br><span class="tag-hung">Đụng độ</span></td>
+                        <td>Tý-Ngọ, Sửu-Mùi, Dần-Thân, Mão-Dậu, Thìn-Tuất, Tỵ-Hợi</td>
+                        <td>Sự đối kháng tột độ, vỡ lở, cãi vã, chia ly. Sự việc thay đổi 180 độ, đổi nhà, đổi việc, đi công tác.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hình &<br>Tự Hình</strong><br><span class="tag-hung">Tra tấn</span></td>
+                        <td><em>Tam hình:</em> Dần-Tỵ-Thân, Sửu-Tuất-Mùi, Tý-Mão<br><em>Tự hình:</em> Thìn, Ngọ, Dậu, Hợi</td>
+                        <td>Sự tra tấn về tinh thần, bực dọc nội tâm, tự mình làm khổ mình. Tổn thương thể xác, dính dáng luật pháp/kiện tụng.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lục Hại</strong><br><span class="tag-hung">Đâm lén</span></td>
+                        <td>Tý-Mùi, Sửu-Ngọ, Dần-Tỵ, Mão-Thìn, Thân-Hợi, Dậu-Tuất</td>
+                        <td>Bằng mặt không bằng lòng, phản bội. Có kẻ tiểu nhân ném đá giấu tay, ngầm phá hoại thành quả.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Lục Phá</strong><br><span class="tag-hung">Đứt gãy</span></td>
+                        <td>Tý-Dậu, Sửu-Thìn, Dần-Hợi, Mão-Ngọ, Tỵ-Thân, Mùi-Tuất</td>
+                        <td>Một thứ đang nguyên vẹn bị làm cho sứt mẻ. Đang làm giữa chừng thì hỏng hóc thiết bị, rách giấy tờ, gián đoạn dòng tiền.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </details>
+        
+        <details>
+            <summary>🔮 7. Bộ Thần Sát cốt lõi (Nét vẽ quyết định)</summary>
+            <p>Ghép nối các Thần sát này với Thiên Tướng/Lục Thân đi kèm sẽ cho ra chi tiết kịch tính của sự việc:</p>
+            <ul>
+                <li><strong style="color: #27ae60;">DỊCH MÃ (Xê dịch):</strong> Chuyển động, bôn ba, xe cộ. Đi với Cát thần là thăng tiến/kiếm tiền, đi với Hung thần/Bạch Hổ là tai nạn giao thông.</li>
+                <li><strong style="color: #27ae60;">THIÊN LỘC (Tiền & Sinh Mệnh):</strong> Lương cứng, nguồn thu thụ động an toàn. Đại diện cho cơ thể người bệnh. Nếu Lộc bị Tuần Không/Xung Phá là mất lộc, sức khỏe nguy kịch.</li>
+                <li><strong style="color: #e84393;">ĐÀO HOA (Sức hút & Dục vọng):</strong> Quyến rũ, nhan sắc. Cực tốt cho nghề Sale/Nghệ thuật. Nếu hỏi gia đạo mà đi kèm Huyền Vũ/Thái Âm là 100% có người thứ 3 ngoại tình.</li>
+                <li><strong style="color: #c0392b;">PHÁ TOÁI / NGUYỆT PHÁ (Đứt gãy):</strong> Hợp đồng bị xé bỏ, hôn nhân ly dị rạn nứt, dự án gãy gánh giữa chừng.</li>
+                <li><strong style="color: #c0392b;">ĐẠI SÁT / TIỂU SÁT (Sụp đổ toàn diện):</strong> Sát thủ càn quét. Báo hiệu phá sản, tai nạn đổ máu (huyết quang), kiện tụng khốc liệt. Đi kèm Bạch Hổ/Câu Trần thì sát thương x10. Chỉ được giải nếu rơi vào Tuần Không.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>🛡️ 8. Kịch Bản Lật Kèo Bản Mệnh (Sinh/Khắc giữa Mạt Truyền và Năm Sinh)</summary>
+            <p>Sau khi xem Cát/Hung của Tam Truyền, phải đem Mạt Truyền (Kết cục) so găng với Bản Mệnh (Địa chi năm sinh) để xem phản ứng cuối cùng với cơ thể người hỏi:</p>
+            <ul>
+                <li><strong style="color: #27ae60;">CẢI TỬ HOÀN SINH (Mạt sinh Mệnh):</strong> Quẻ Cực Hung, mọi người đều chết nhưng bạn được cứu sống phút chót. Trong thảm họa vẫn tìm thấy đường lui hoặc hưởng lợi từ đống tro tàn.</li>
+                <li><strong style="color: #c0392b;">BÁNH VẼ / ĐỘC DƯỢC (Mạt khắc Mệnh):</strong> Quẻ Cực Cát, dự án nghìn tỷ, tiền ngập mặt nhưng bạn cố ăn vào là gãy răng/đi tù/ốm đau hoặc bị kẻ khác nẫng tay trên. "Thấy cỗ mà không được ăn".</li>
+                <li><strong>SINH XUẤT (Mệnh sinh Mạt):</strong> Kết quả tốt nhưng bạn bị vắt kiệt sức lực, lao tâm khổ tứ, hao tài tốn của để nuôi sự việc.</li>
+                <li><strong>KHẮC XUẤT (Mệnh khắc Mạt):</strong> Tuy vất vả đối đầu nhưng bạn vẫn ở thế chủ động, nắm quyền kiểm soát và định đoạt được kết quả cuối cùng.</li>
+                <li><strong>ĐỒNG HÀNH (Tỷ Hòa):</strong> Sự việc kết thúc bình ổn, kết quả thu về tương xứng với năng lực bạn bỏ ra.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>🌱 9. Ý nghĩa Vòng đời 12 Trạng thái Trường Sinh (Sức sống sự việc)</summary>
+            <p>Vòng Trường Sinh phản ánh chu kỳ sinh diệt của một sự việc. Khí của cung đó mạnh hay yếu, đang ở giai đoạn "đâm chồi" hay "xuống dốc" đều thể hiện ở đây:</p>
+            <table class="ref-table">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Trạng Thái</th>
+                        <th style="width: 15%;">Giai đoạn</th>
+                        <th>Ý Nghĩa Thực Chiến</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Trường Sinh</strong></td><td><span class="tag-cat">Phát triển</span></td><td>Khởi đầu mới, vạn vật sinh sôi, tràn đầy năng lượng và hy vọng. Rất tốt để bắt đầu dự án mới.</td></tr>
+                    <tr><td><strong>Mộc Dục</strong></td><td><span class="tag-neutral">Bất ổn</span></td><td>Giai đoạn gột rửa, ngây thơ, dễ mắc sai lầm, thường dính líu đến đào hoa, tửu sắc, cốt lõi chưa vững.</td></tr>
+                    <tr><td><strong>Quan Đới</strong></td><td><span class="tag-cat">Tích lũy</span></td><td>Mặc áo mão, trang bị kiến thức/quyền lực, bắt đầu gánh vác trách nhiệm, trưởng thành.</td></tr>
+                    <tr><td><strong>Lâm Quan</strong></td><td><span class="tag-cat">Hưng thịnh</span></td><td>Ra làm quan, có lộc, tự lập tự cường, công danh sự nghiệp đều thuận lợi, vững vàng.</td></tr>
+                    <tr><td><strong>Đế Vượng</strong></td><td><span class="tag-cat">Đỉnh cao</span></td><td>Cực thịnh, sức mạnh đạt mức tối đa. Làm gì cũng thành công lớn, nhưng lưu ý "vật cực tất phản" (sắp xuống dốc).</td></tr>
+                    <tr><td><strong>Suy</strong></td><td><span class="tag-hung">Hạ dốc</span></td><td>Bắt đầu đi xuống, suy thoái, mệt mỏi, lực bất tòng tâm, thiếu năng lượng để vươn lên.</td></tr>
+                    <tr><td><strong>Bệnh</strong></td><td><span class="tag-hung">Yếu ớt</span></td><td>Bệnh tật, nhiều khuyết điểm, bế tắc, sự việc trì trệ cần phải dừng lại để "chữa trị".</td></tr>
+                    <tr><td><strong>Tử</strong></td><td><span class="tag-hung">Chấm dứt</span></td><td>Chết chóc, chấm dứt hoàn toàn, không còn sinh khí, bế tắc, ngõ cụt. Nên từ bỏ.</td></tr>
+                    <tr><td><strong>Mộ</strong></td><td><span class="tag-neutral">Đóng kín</span></td><td>Mắc kẹt, bế tắc, giấu giếm (Nhập mộ). Hoặc mang ý nghĩa thu gom, tích lũy vào kho tàng (Tùy ngữ cảnh).</td></tr>
+                    <tr><td><strong>Tuyệt</strong></td><td><span class="tag-hung">Tuyệt diệt</span></td><td>Đứt đoạn, hư không, không còn tia hy vọng nào. Là lúc phải thay đổi triệt để để chờ chu kỳ mới.</td></tr>
+                    <tr><td><strong>Thai</strong></td><td><span class="tag-neutral">Tích tụ</span></td><td>Phôi thai nhen nhóm, ý tưởng mới hình thành, âm thầm chuẩn bị nhưng còn rất yếu ớt, cần bảo vệ.</td></tr>
+                    <tr><td><strong>Dưỡng</strong></td><td><span class="tag-cat">Nuôi dưỡng</span></td><td>Chăm sóc, bồi bổ, lớn dần lên, ấp ủ chờ thời cơ chín muồi để bùng nổ.</td></tr>
+                </tbody>
+            </table>
+        </details>
+        
+        <details>
+            <summary>🤝 10. Động Lực Học Tứ Khóa (Giao Xa & Nghệ thuật đàm phán)</summary>
+            <p>Tứ Khóa chia làm 2 phe: <strong>Phe Ta</strong> (Khóa 1, Khóa 2) và <strong>Phe Khách/Đối tác</strong> (Khóa 3, Khóa 4). Việc quét dọc và quét chéo sẽ vạch trần mọi mưu đồ đàm phán:</p>
+            <ul>
+                <li><strong style="color: #2980b9;">QUÉT NGANG (Bề nổi - Khóa 1 đấu Khóa 3):</strong> 
+                    <ul>
+                        <li><strong>Ta khắc Khách:</strong> Ta nắm quyền sinh sát, ép giá đối tác thành công.</li>
+                        <li><strong>Khách khắc Ta:</strong> Khách cửa trên, Ta bị chèn ép, vùi dập, bất lợi.</li>
+                        <li><strong>Ta sinh Khách:</strong> Ta hao tâm tổn trí, vất vả chạy theo phục vụ, làm lợi cho đối phương.</li>
+                        <li><strong>Khách sinh Ta:</strong> Đối tác nhượng bộ, dâng lợi lộc cho Ta.</li>
+                    </ul>
+                </li>
+                <li><strong style="color: #e74c3c;">QUÉT CHÉO (Giao Xa - Mưu đồ ngầm - K1xK4 & K3xK2):</strong> 
+                    <ul>
+                        <li><strong>Hỗ Sinh (Đại Win-Win):</strong> Ta và Khách âm thầm nuôi dưỡng hậu phương (sân sau) của nhau. Hai bên cùng có lợi tột độ. Hợp tác cực kỳ bền vững.</li>
+                        <li><strong>Hỗ Khắc (Bữa tiệc đẫm máu):</strong> Bề ngoài có thể tươi cười hợp tác, nhưng bắt chéo lại gài bẫy, triệt hạ hậu phương của nhau. Chơi dao có ngày đứt tay.</li>
+                        <li><strong>Mật Ngọt Chết Ruồi:</strong> Khách sinh cho Ta ở bề nổi (nịnh nọt, nhượng bộ), nhưng Khách lại Khắc/Hút máu Khóa 2 của Ta. Đối tác dùng mồi nhử để âm thầm vắt kiệt tài nguyên cốt lõi của bạn!</li>
+                    </ul>
+                </li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>👁️ 11. Tuyệt kỹ Tàng Hình (Âm Thần & Độn Can)</summary>
+            <p>Không có gì hiển hiện trên Tam Truyền mà không có cái bóng phía sau. Để lật tẩy mưu đồ mờ ám, phải soi vào "Góc Khuất" của Sơ - Trung - Mạt Truyền:</p>
+            <ul>
+                <li><strong style="color: #8e44ad;">ÂM THẦN (Bản chất thật - Vỏ bọc):</strong> Là chữ nằm ẩn ngay phía sau Dương Thần (bề nổi). Ví dụ: Bề mặt là Thanh Long (hứa hẹn làm ăn rực rỡ), nhưng móc Âm thần ra lại là Huyền Vũ (lừa đảo, giấu giếm) -> Đây là bánh vẽ lừa tiền.</li>
+                <li><strong style="color: #8e44ad;">ĐỘN CAN (Động cơ thầm kín):</strong> Thiên can ẩn dưới Địa chi. Bóc trần mục đích sâu kín không bao giờ nói ra miệng. Ví dụ: Đối tác mở miệng nói vì "Tình nghĩa anh em", nhưng soi Độn Can ra chữ Thê Tài -> Động cơ thật sự chỉ là nhắm vào túi tiền của bạn. Nếu Độn Can ra chữ Không (Tuần Không) -> Họ chém gió, lời nói sáo rỗng vô giá trị.</li>
+            </ul>
+        </details>
+        
+        <details>
+            <summary>🚪 12. Cửu Tông Môn (9 Kịch bản khởi nguồn sự việc)</summary>
+            <p>App tự động rà soát Tứ Khóa để tìm ra mâu thuẫn mạnh nhất bốc lên làm Sơ Truyền. Tên cánh cửa (Cửu Tông Môn) sẽ bật mí bản chất sự việc:</p>
+            <ul>
+                <li><strong>1. Tặc Khắc (Xung đột trực diện):</strong> Sự việc bắt nguồn từ mâu thuẫn hiển hiện, ai cũng thấy (sếp chửi nhân viên, cãi vã, ép giá). Nhanh, gọn, rõ ràng.</li>
+                <li><strong>2. Tỷ Dụng / Thiệp Hại (Gian nan tột cùng):</strong> Có sự chia bè kết phái. Khởi nguồn bằng muôn vàn khó khăn, trắc trở, lội bùn vượt suối, chạy vạy giấy tờ hao tâm tổn trí.</li>
+                <li><strong>3. Dao Khắc (Mũi tên bắn lén):</strong> Tai họa từ xa bay đến. Bị ném đá giấu tay, tin đồn thất thiệt, rắc rối khách quan ập xuống vô cớ.</li>
+                <li><strong>4. Mão Tinh (Đêm tối dò đường):</strong> Mờ mịt, âm mưu. Sự việc tĩnh lặng, người hỏi hoang mang tiến thoái lưỡng nan, có biến ngầm chưa lật bài ngửa.</li>
+                <li><strong>5. Biệt Trách (Sự chắp vá):</strong> Dựa dẫm người khác. Sự việc không tự nhiên mà có, phải đi vay mượn, nhờ vả, chắp vá mới thành.</li>
+                <li><strong>6. Bát Chuyên (Dây dưa, dâm dục):</strong> Bầu trời và mặt đất trùng lặp. Rườm rà, cắt không đứt bứt không rời. Dính líu tài chính bất minh hoặc tình ái mờ ám.</li>
+                <li><strong>7. Phục Ngâm (Vũ trụ đóng băng):</strong> Mắc kẹt, bế tắc, ngoan cố bảo thủ không chịu thay đổi. Uất tự nén chặt bên trong.</li>
+                <li><strong>8. Phản Ngâm (Vũ trụ lật bàn):</strong> Lật kèo chớp nhoáng, xốc nổi, bốc đồng, hủy bỏ cam kết, nay thế này mai thế khác.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>⏳ 13. Nghệ Thuật Đoán Ứng Kỳ (Chốt hạ mốc thời gian)</summary>
+            <p>Để biết TỪNG NÀO việc đó mới xảy ra, hãy tìm xem mâm quẻ đang bị "kẹt" ở đâu. Chỗ nào kẹt, thời điểm gỡ được nút thắt đó chính là Ứng Kỳ. Có 4 chiếc chìa khóa mở trục thời gian:</p>
+            <ul>
+                <li><strong style="color: #d35400;">1. Chìa khóa XUẤT KHÔNG (Lấp đầy khoảng trống):</strong> Dụng thần bị rơi vào Tuần Không (Trống rỗng, hứa suông). ➔ Sự việc sẽ xảy ra vào thời điểm <strong>Điền Thực</strong> (Chính tháng/ngày đó lấp vào) hoặc <strong>Xung Không</strong> (Tháng/ngày đối xung đập vỡ lớp vỏ bọc). Ví dụ: Kẹt ở Mão -> Đợi tháng Mão hoặc tháng Dậu.</li>
+                <li><strong style="color: #d35400;">2. Chìa khóa PHÁ MỘ (Phá cửa nhà giam):</strong> Dụng thần chui vào 4 cái kho (Sửu, Thìn, Mùi, Tuất). Mọi thứ bị đóng băng, kẹt vốn, dự án đắp chiếu. ➔ Chìa khóa duy nhất là lực tông trực diện của <strong>LỤC XUNG</strong>. (Kẹt Thìn -> Đợi Tuất, Kẹt Sửu -> Đợi Mùi...).</li>
+                <li><strong style="color: #27ae60;">3. Chìa khóa LỤC HỢP (Đang Tán chờ Tụ):</strong> Quẻ toàn là Lục Xung, bung bét, cãi vã, ly tán. ➔ Phải đợi ngày/tháng <strong>LỤC HỢP</strong> để kéo mọi thứ kết dính lại với nhau, êm xuôi ký kết.</li>
+                <li><strong style="color: #e74c3c;">4. Chìa khóa LỤC XUNG (Đang Tụ chờ Tán):</strong> Quẻ toàn là Hợp, dính chặt lấy nhau, dây dưa không dứt điểm được. ➔ Bắt buộc phải đợi ngày/tháng <strong>LỤC XUNG</strong> để lấy dao cắt đứt dây nhợ (đòi nợ xong, ly hôn dứt điểm).</li>
+            </ul>
+        </details>
+        
+        <details>
+            <summary>🎯 14. Định Vị "Loại Thần" (Tuyệt kỹ khóa mục tiêu 1 giây)</summary>
+            <p>Không cần phân tích lan man, khách hỏi việc gì thì tìm đúng <strong>Loại Thần (Lục Thân)</strong> đó trên quẻ để xem nó Sống hay Chết. Tránh bị ngợp dữ liệu!</p>
+
+            <h4 style="color: #2980b9; margin-bottom: 5px;">I. Ý NGHĨA 5 NHÓM LỤC THÂN CỐT LÕI</h4>
+            <ul style="margin-top: 0;">
+                <li><strong style="color: #2980b9;">PHỤ MẪU (Sinh ra Ta / Bảo vệ Ta):</strong> Giấy tờ, hợp đồng, nhà cửa, xe cộ, bằng cấp, cha mẹ, người chống lưng.</li>
+                <li><strong style="color: #27ae60;">TỬ TÔN (Do Ta sinh ra / Giải cứu):</strong> Trẻ em, con cái, sản phẩm do mình làm ra, sự tự do. Đặc biệt: Là <strong>THUỐC</strong> chữa bệnh, giải trừ tai họa.</li>
+                <li><strong style="color: #d35400;">THÊ TÀI (Bị Ta khắc / Ta kiểm soát):</strong> Tiền bạc, tài sản, dòng vốn, lợi nhuận, vợ/bạn gái (nếu nam hỏi tình duyên).</li>
+                <li><strong style="color: #8e44ad;">QUAN QUỶ (Khắc Ta / Kiểm soát Ta):</strong> <em>Nghĩa Cát:</em> Công danh, chức vụ, sếp, chồng/người yêu (nữ hỏi). <em>Nghĩa Hung:</em> Tai họa, bệnh tật nan y, quan tòa, pháp luật, áp lực tột độ.</li>
+                <li><strong style="color: #c0392b;">HUYNH ĐỆ (Ngang hàng với Ta):</strong> Anh em, bạn bè, đồng nghiệp, đối thủ cạnh tranh. Là <strong>Kẻ cướp tiền</strong> (vì Huynh đệ khắc Thê Tài).</li>
+            </ul>
+
+            <h4 style="color: #2980b9; margin-bottom: 5px;">II. BÍ KÍP KHÓA MỤC TIÊU THEO TỪNG CÂU HỎI</h4>
+            <table class="ref-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Chủ đề hỏi</th>
+                        <th style="width: 25%;">Dụng Thần (Mục tiêu)</th>
+                        <th>Cách luận đoán nhanh (1 giây)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Công Danh / Xin Việc</strong></td>
+                        <td><strong>Quan Quỷ</strong> (Sếp/Việc)<br><strong>Phụ Mẫu</strong> (Hợp đồng)</td>
+                        <td>Quan Quỷ vượng và Sinh cho Ta là đỗ đạt, thăng chức. Phụ Mẫu vượng là ký được hợp đồng tốt.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kinh Doanh / Tài Lộc</strong></td>
+                        <td><strong>Thê Tài</strong> (Lợi nhuận)<br><strong>Tử Tôn</strong> (Khách hàng)</td>
+                        <td>Thê Tài vượng, không bị Tuần Không là có tiền. Thấy <strong>Huynh Đệ</strong> ở Sơ truyền: Cẩn thận đối thủ cướp khách, nội bộ lừa tiền.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Tình Duyên</strong></td>
+                        <td>Nam hỏi: <strong>Thê Tài</strong><br>Nữ hỏi: <strong>Quan Quỷ</strong></td>
+                        <td>Nam xem Thê Tài (kết hợp Đào Hoa). Nữ xem Quan Quỷ. Vượng, Tương sinh là tốt đẹp. Xung/Phá là chia ly.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Kiện Tụng / Pháp Lý</strong></td>
+                        <td><strong>Chu Tước</strong> (Đơn kiện)<br><strong>Quan Quỷ</strong> (Quan tòa)</td>
+                        <td>Quan Quỷ <em>khắc Ta</em>: Ta bị xử thua. Quan Quỷ <em>sinh Ta</em>: Ta thắng kiện.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mất Trộm / Thất Lạc</strong></td>
+                        <td><strong>Thê Tài</strong> (Đồ mất)<br><strong>Huyền Vũ</strong> (Kẻ trộm)</td>
+                        <td>Xem Huyền Vũ nằm ở đâu để biết hướng trộm trốn. Mạt truyền (Kết cục) <em>Khắc</em> Huyền Vũ là tóm được trộm, lấy lại đồ.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </details>
+        
+        <details>
+            <summary>🌪️ 15. Các Thế Trận Kinh Điển (Phục Ngâm & Phản Ngâm)</summary>
+            <p>Khi Tứ Khóa và Tam Truyền xếp thành những cấu trúc dị thường, vũ trụ sẽ rơi vào 2 thế trận vĩ đại nhất:</p>
+            <ul>
+                <li><strong style="color: #2980b9;">PHỤC NGÂM (Vũ trụ Đóng Băng - Bầu trời rớt trùng Mặt đất):</strong> 
+                    <br><em>Hiện tượng:</em> Khóa 1 là Dần/Dần, Khóa 3 là Thìn/Thìn (Chữ trên = Chữ dưới).
+                    <br><em>Bản chất:</em> Đình trệ tột độ, kẹt cứng, tiến thoái lưỡng nan. 
+                    <br><em>Thực chiến:</em> Cầu tài/Khởi nghiệp: Tuyệt đối không làm (chết vốn). Xin việc: Nằm im chịu trận, đừng nhảy việc.
+                    <br><em>Chiến thuật:</em> <strong>"TỊNH"</strong> (Tĩnh lặng, án binh bất động, bảo toàn lực lượng).
+                </li>
+                <li style="margin-top: 8px;"><strong style="color: #e74c3c;">PHẢN NGÂM (Vũ trụ Lật Bàn - Bầu trời đối đầu Mặt đất):</strong> 
+                    <br><em>Hiện tượng:</em> Tứ Khóa toàn Lục Xung (Tý trên Ngọ, Mão trên Dậu...).
+                    <br><em>Bản chất:</em> Biến động thần tốc, đảo lộn, lật kèo phút chót, bất trắc.
+                    <br><em>Thực chiến:</em> Kinh doanh: Đánh nhanh rút gọn thì thắng, ôm lâu là chết. Mất đồ/Bệnh tật: Rất tốt (mất rồi tìm lại được, ốm tự khỏe). Tình duyên: Nhanh cưới nhanh ly hoặc quay lại NYC.
+                    <br><em>Chiến thuật:</em> <strong>"ĐỘNG"</strong> (Linh hoạt, chuẩn bị Plan B, không tin tuyệt đối vào cam kết).
+                </li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>💼 16. Thực Chiến: Kinh Doanh & Đầu Tư</summary>
+            <ul>
+                <li><strong>Quét Giao Xa (Vị thế):</strong> Khách khắc Ta -> Ta bị chèn ép. Ta sinh Khách -> Ta hụt hơi, phải nhượng bộ chốt Sale.</li>
+                <li><strong>Dụng Thần (Thê Tài + Thanh Long):</strong> Mỏ vàng đích thực, lợi nhuận lớn. Nếu Thê Tài cõng <strong>Huyền Vũ</strong> hoặc <strong>Tuần Không</strong>: Dự án bánh vẽ, báo cáo giả, tuyệt đối không xuống tiền!</li>
+                <li><strong>Nhập Mộ (Giam vốn):</strong> Chữ Thê Tài (Tiền) rơi vào Thìn, Tuất, Sửu, Mùi. Hàng tồn kho chất đống, tiền chết cứng. Cần đợi ngày/tháng Lục Xung để <strong>Phá Mộ (Giải cứu rút tiền)</strong>.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>🎓 17. Thực Chiến: Công Danh & Thi Cử</summary>
+            <ul>
+                <li><strong>Quan Quỷ (Cái ghế / Sếp):</strong> Sinh Bản Mệnh -> Đỗ đạt, sếp cất nhắc. Khắc Bản Mệnh -> Đậu vào cũng bị bóc lột, áp lực thiêu rụi bản thân.</li>
+                <li><strong>Phụ Mẫu (Bằng cấp / Offer Letter):</strong> Nếu xuất hiện là có giấy trắng mực đen. Nếu rơi vào <strong>Tuần Không</strong>: Hứa mồm, rớt phỏng vấn, hồ sơ bị loại.</li>
+                <li><strong>Chu Tước (Phỏng vấn / Lời nói):</strong> Chu Tước sinh trợ -> Hùng biện tốt. Chu Tước Tuần Không -> Vào phòng thi não đóng băng, cấm khẩu.</li>
+                <li><strong>Thái Tuế & Quý Nhân:</strong> Nếu Quý Nhân sinh cho Huynh Đệ (Đối thủ) -> Kịch bản ngầm: Đối thủ đã đi cửa sau, có sếp lớn cơ cấu từ trước, mình chỉ là quân xanh.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>💔 18. Thực Chiến: Tình Duyên & Ngoại Tình</summary>
+            <ul>
+                <li><strong>Mộc Dục (Dục vọng trỗi dậy):</strong> Chồng/Vợ rơi vào trạng thái Mộc Dục trong 12 Trường sinh -> Buông thả, nhục dục, dễ sa ngã.</li>
+                <li><strong>Đào Hoa + Huyền Vũ:</strong> Dấu hiệu thép của sự phản bội. Đào Hoa (Quyến rũ ngoài luồng) + Huyền Vũ (Lén lút, che đậy, lừa dối).</li>
+                <li><strong>Độn Can vạch mặt Trà xanh:</strong> Vợ xem chồng (Quan Quỷ) mà dưới Độn Can ẩn chữ <strong>Thê Tài</strong> (Tiền/Nữ khác) -> Chồng đang ngầm dùng tài sản chung để nuôi tiểu tam trong bóng tối.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>🏥 19. Thực Chiến: Bệnh Tật & Tìm Đồ Mất</summary>
+            <ul>
+                <li><strong>Chẩn Bệnh (Tử Tôn chế Quan Quỷ):</strong> Quan Quỷ (Mầm bệnh) cực vượng -> Ác tính. Nếu Quan Quỷ rơi vào Tử/Tuyệt -> Bệnh thoái trào, tự khỏi. Nếu có <strong>Tử Tôn</strong> (Bác sĩ/Thuốc) cực vượng -> Gặp được Thần y cứu sống từ cửa tử.</li>
+                <li><strong>Mộ Khố (Phòng ICU):</strong> Bản mệnh nhập Mộ (Sửu, Thìn, Tuất, Mùi) -> Hôn mê sâu. Cần đợi thời khắc Lục Xung để đập vỡ kho tàng cứu người.</li>
+                <li><strong>La bàn Huyền Vũ (Tìm trộm):</strong> Huyền Vũ cưỡi Dần/Mão (Đông), Tỵ/Ngọ (Nam), Thân/Dậu (Tây), Hợi/Tý (Bắc). Đợi ngày Mạt Truyền <strong>Lục Xung đập thẳng vào Huyền Vũ</strong> là lúc tóm gọn tên trộm và thu hồi tài sản.</li>
+            </ul>
+        </details>
+
+        <details>
+            <summary>⚖️ 20. Thực Chiến: Phong Thủy & Kiện Tụng</summary>
+            <ul>
+                <li><strong>Phong Thủy Gia Trạch (Can và Chi):</strong> Can là Người, Chi là Nhà. <strong>Chi sinh Can</strong> -> Nhà dưỡng người, đại cát. <strong>Chi khắc Can</strong> -> Nhà đè người, sát khí, hút cạn sinh lực gia chủ.</li>
+                <li><strong>Thần sát ngự trên Nhà (Chi):</strong> Có <strong>Đằng Xà</strong> -> Nhà vượng âm, có thực thể tâm linh, ác mộng ảo giác. Có <strong>Bạch Hổ</strong> -> Góc nhọn đâm vào, dễ cãi vã đổ máu.</li>
+                <li><strong>Kiện Tụng (Lý lẽ & Quan tòa):</strong> Khóa 1 (Ta) rơi vào Tuần Không -> Mất bằng chứng, đuối lý. Khóa 3 (Đối thủ) được Thái Tuế/Quan Quỷ (Quan tòa) sinh trợ -> Đối thủ thắng. Bản mệnh nhập Mộ bị Thái tuế khắc -> Cầm chắc án tù tội lao lý.</li>
+            </ul>
+        </details>
+
+    </div>
+
+    <div class="card">
+        <h2>* Khung Sao Chép Prompt Cho AI Luận Giải Thực Chiến</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+            <p style="font-size: 14px; margin: 0; color:#7f8c8d;">Nhấn nút bên cạnh để Copy nhanh toàn bộ dữ liệu, sau đó Paste (Dán) cho ChatGPT/Gemini:</p>
+            <button type="button" id="btn-copy" onclick="copyPrompt()" style="background-color: #8e44ad; width: auto; padding: 8px 15px; font-size: 14px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">📋 Sao chép nhanh cho AI</button>
+        </div>
+        <textarea id="prompt_text" readonly onclick="this.select();">Hãy đóng vai Tông Sư Lục Nhâm Đại Độn, kết hợp tư duy chiến lược kinh doanh và tâm lý học hiện đại để luận giải quẻ này. Nhiệm vụ của bạn không phải là phán phó mặc cho số phận, mà là làm Cố vấn chiến lược, giúp người hỏi quản trị rủi ro, tối ưu hóa nguồn lực và tìm ra lối thoát.
+
+Chủ đề khách hỏi thuộc nhóm: {{ tinh_ban.nhom_van_de | upper }}
+Câu hỏi cụ thể là: "{{ tinh_ban.cau_hoi if tinh_ban.cau_hoi else 'Không có câu hỏi cụ thể, hãy luận giải tổng quan' }}"
+
+* BỐI CẢNH THỜI GIAN NGÀY ĐÊM & CHIỀU XOAY:
+- Bầu trời gieo quẻ: Ban {{ tinh_ban.tru_da }} (Trú Dạ)
+- Chiều xoay Thiên Thần: Quý Nhân đi {{ tinh_ban.chieu_xoay }}
+- Tứ trụ gieo quẻ: Năm {{ tinh_ban.tu_tru.nam }} - Tháng {{ tinh_ban.tu_tru.thang }} - Ngày {{ tinh_ban.tu_tru.ngay }} - Giờ {{ tinh_ban.tu_tru.gio }}
+- Thái Tuế: {{ tinh_ban.thai_tue }} | Nguyệt Kiến: {{ tinh_ban.nguyet_kien }}
+- Chiêm Thời (Động cơ): {{ tinh_ban.chiem_thoi }}
+- Nguyệt Tướng (Ánh sáng hóa giải): {{ tinh_ban.nguyet_tuong }} (Giáng tại Địa bàn {{ tinh_ban.chiem_thoi }})
+- Tuần Không: {{ tinh_ban.khong_vong.ngay|join(', ') }}
+
+* THIÊN ĐẠO VĨ MÔ (Phán quyết của Đất Trời):
+- Thái Tuế vs Sơ Truyền: {{ tinh_ban.vi_mo.thai_tue }}
+- Nguyệt Kiến vs Sơ Truyền: {{ tinh_ban.vi_mo.nguyet_kien }}
+{% if tinh_ban.vi_mo.nguyet_tuong_menh %}- Hộ Mệnh: {{ tinh_ban.vi_mo.nguyet_tuong_menh }}{% endif %}
+
+{% if tinh_ban.sinh_than %}
+* BẢN MỆNH VÀ KỊCH BẢN LẬT KÈO:
+- Bát Tự sinh: {{ tinh_ban.sinh_than.tu_tru.nam }} - {{ tinh_ban.sinh_than.tu_tru.thang }} - {{ tinh_ban.sinh_than.tu_tru.ngay }} - {{ tinh_ban.sinh_than.tu_tru.gio }}
+- Bản Mệnh (Gốc): Chi {{ tinh_ban.sinh_than.menh }} | Nhật Chủ: {{ tinh_ban.sinh_than.nhat_chu_can }}
+- Hành Niên (Ngọn): {{ tinh_ban.sinh_than.hanh_nien }}
+- Tình trạng hiện tại (Thượng Thần): {{ tinh_ban.sinh_than.thuong_than_msg }}
+- Lật Kèo Bản Mệnh (Mạt so găng Năm sinh): {{ tinh_ban.sinh_than.lat_keo }}
+{% endif %}
+
+* BƯỚC 1: TỔNG QUAN CHỦ KHÁCH (Nhìn từ Can Chi Ngày gieo quẻ):
+- Đại diện TA: Can {{ tinh_ban.can_ngay }} [{{ tinh_ban.quan_he_can_chi.can_ngay_icon }}]
+- Đại diện VIỆC: Chi {{ tinh_ban.chi_ngay }} [{{ tinh_ban.quan_he_can_chi.chi_ngay_icon }}]
+- Bắt mạch Bước 1: {{ tinh_ban.quan_he_can_chi.msg }}
+
+{% if tinh_ban.the_tran %}
+* THẾ TRẬN KINH ĐIỂN: {{ tinh_ban.the_tran }}
+- Cảnh báo: {{ tinh_ban.the_tran_msg }}
+{% endif %}
+
+* TỨ KHÓA (Giao Xa Động Lực Học - Đọc Vị Mưu Đồ):
+- Khóa 1 (Ta): Thiên {{ tinh_ban.tu_khoa[0].tren }} lâm Địa {{ tinh_ban.tu_khoa[0].duoi }} | Thần: {{ tinh_ban.tu_khoa[0].luc_than }} | Khí: {{ tinh_ban.tu_khoa[0].vuong_suy }} | Vòng Đời: {{ tinh_ban.tu_khoa[0].truong_sinh }} | Tướng: {{ tinh_ban.tu_khoa[0].tuong }} ({{ tinh_ban.tu_khoa[0].noi_ngoai_chien }}) | Trời/Đất: {{ tinh_ban.tu_khoa[0].thien_dia_chien }} | Thần Sát: {{ tinh_ban.tu_khoa[0].than_sat|join(', ') }} | Độn: {{ tinh_ban.tu_khoa[0].don_can }} ({{ tinh_ban.tu_khoa[0].don_can_luc_than }} -> {{ tinh_ban.tu_khoa[0].don_can_quan_he }}){% if tinh_ban.tu_khoa[0].is_tuan_khong %} [TUẦN KHÔNG]{% endif %}{% if tinh_ban.tu_khoa[0].is_nhap_mo %} [NHẬP MỘ]{% endif %}{% if tinh_ban.tu_khoa[0].is_chiem_thoi %} [CHIÊM THỜI]{% endif %}{% if tinh_ban.tu_khoa[0].is_nguyet_tuong %} [NGUYỆT TƯỚNG]{% endif %}
+- Khóa 2 (Hậu phương Ta): Thiên {{ tinh_ban.tu_khoa[1].tren }} lâm Địa {{ tinh_ban.tu_khoa[1].duoi }} | Thần: {{ tinh_ban.tu_khoa[1].luc_than }} | Khí: {{ tinh_ban.tu_khoa[1].vuong_suy }} | Vòng Đời: {{ tinh_ban.tu_khoa[1].truong_sinh }} | Tướng: {{ tinh_ban.tu_khoa[1].tuong }} ({{ tinh_ban.tu_khoa[1].noi_ngoai_chien }}) | Trời/Đất: {{ tinh_ban.tu_khoa[1].thien_dia_chien }} | Thần Sát: {{ tinh_ban.tu_khoa[1].than_sat|join(', ') }} | Độn: {{ tinh_ban.tu_khoa[1].don_can }} ({{ tinh_ban.tu_khoa[1].don_can_luc_than }} -> {{ tinh_ban.tu_khoa[1].don_can_quan_he }}){% if tinh_ban.tu_khoa[1].is_tuan_khong %} [TUẦN KHÔNG]{% endif %}{% if tinh_ban.tu_khoa[1].is_nhap_mo %} [NHẬP MỘ]{% endif %}{% if tinh_ban.tu_khoa[1].is_chiem_thoi %} [CHIÊM THỜI]{% endif %}{% if tinh_ban.tu_khoa[1].is_nguyet_tuong %} [NGUYỆT TƯỚNG]{% endif %}
+- Khóa 3 (Khách): Thiên {{ tinh_ban.tu_khoa[2].tren }} lâm Địa {{ tinh_ban.tu_khoa[2].duoi }} | Thần: {{ tinh_ban.tu_khoa[2].luc_than }} | Khí: {{ tinh_ban.tu_khoa[2].vuong_suy }} | Vòng Đời: {{ tinh_ban.tu_khoa[2].truong_sinh }} | Tướng: {{ tinh_ban.tu_khoa[2].tuong }} ({{ tinh_ban.tu_khoa[2].noi_ngoai_chien }}) | Trời/Đất: {{ tinh_ban.tu_khoa[2].thien_dia_chien }} | Thần Sát: {{ tinh_ban.tu_khoa[2].than_sat|join(', ') }} | Độn: {{ tinh_ban.tu_khoa[2].don_can }} ({{ tinh_ban.tu_khoa[2].don_can_luc_than }} -> {{ tinh_ban.tu_khoa[2].don_can_quan_he }}){% if tinh_ban.tu_khoa[2].is_tuan_khong %} [TUẦN KHÔNG]{% endif %}{% if tinh_ban.tu_khoa[2].is_nhap_mo %} [NHẬP MỘ]{% endif %}{% if tinh_ban.tu_khoa[2].is_chiem_thoi %} [CHIÊM THỜI]{% endif %}{% if tinh_ban.tu_khoa[2].is_nguyet_tuong %} [NGUYỆT TƯỚNG]{% endif %}
+- Khóa 4 (Hậu phương Khách): Thiên {{ tinh_ban.tu_khoa[3].tren }} lâm Địa {{ tinh_ban.tu_khoa[3].duoi }} | Thần: {{ tinh_ban.tu_khoa[3].luc_than }} | Khí: {{ tinh_ban.tu_khoa[3].vuong_suy }} | Vòng Đời: {{ tinh_ban.tu_khoa[3].truong_sinh }} | Tướng: {{ tinh_ban.tu_khoa[3].tuong }} ({{ tinh_ban.tu_khoa[3].noi_ngoai_chien }}) | Trời/Đất: {{ tinh_ban.tu_khoa[3].thien_dia_chien }} | Thần Sát: {{ tinh_ban.tu_khoa[3].than_sat|join(', ') }} | Độn: {{ tinh_ban.tu_khoa[3].don_can }} ({{ tinh_ban.tu_khoa[3].don_can_luc_than }} -> {{ tinh_ban.tu_khoa[3].don_can_quan_he }}){% if tinh_ban.tu_khoa[3].is_tuan_khong %} [TUẦN KHÔNG]{% endif %}{% if tinh_ban.tu_khoa[3].is_nhap_mo %} [NHẬP MỘ]{% endif %}{% if tinh_ban.tu_khoa[3].is_chiem_thoi %} [CHIÊM THỜI]{% endif %}{% if tinh_ban.tu_khoa[3].is_nguyet_tuong %} [NGUYỆT TƯỚNG]{% endif %}
+  
+* ĐỘNG LỰC HỌC TỨ KHÓA:
+- Quét Ngang (Bề nổi): {{ tinh_ban.dong_luc_hoc.quet_ngang }}
+- Quét Dọc (Nội bộ Ta): {{ tinh_ban.dong_luc_hoc.noi_bo_ta }}
+- Quét Dọc (Nội bộ Khách): {{ tinh_ban.dong_luc_hoc.noi_bo_khach }}
+- Quét Chéo (Giao Xa): {{ tinh_ban.dong_luc_hoc.k1_k4 }} VÀ {{ tinh_ban.dong_luc_hoc.k3_k2 }} -> Kết luận: {{ tinh_ban.dong_luc_hoc.giao_xa_ket_luan }}
+
+* TRẠNG THÁI KHÔNG VONG (RỖNG TUẾCH):
+{% if tinh_ban.khong_vong_msg %}{% for msg in tinh_ban.khong_vong_msg %}- {{ msg }}
+{% endfor %}{% else %}- Không có cung nào bị Không Vong.
+{% endif %}
+
+* TƯƠNG QUAN LỰC LƯỢNG NGẦM (HỢP/XUNG/HÌNH/HẠI/PHÁ):
+- Trục Chủ-Khách (Khóa 1 vs Khóa 3): {{ tinh_ban.quan_he_k1_k3 if tinh_ban.quan_he_k1_k3 else 'Bình Hòa' }}
+- Trục Vòng Đời (Sơ Truyền vs Mạt Truyền): {{ tinh_ban.tam_truyen.quan_he_so_mat if tinh_ban.tam_truyen.quan_he_so_mat else 'Bình Hòa' }}
+- Cục Diện Tam Truyền: {{ tinh_ban.tam_truyen.cuc_dien | join(', ') if tinh_ban.tam_truyen.cuc_dien else 'Không tạo cục' }}
+
+* TAM TRUYỀN (BƯỚC 2: Trục Nhân Quả & Sự việc):
+- Cửu Tông Môn (Khởi nguồn): {{ tinh_ban.cuu_tong_mon }}
+- Sơ Truyền (Bắt đầu): Chi {{ tinh_ban.tam_truyen.so.chi }} | Thần: {{ tinh_ban.tam_truyen.so.luc_than }} | Khí: {{ tinh_ban.tam_truyen.so.vuong_suy }} | Vòng Đời: {{ tinh_ban.tam_truyen.so.truong_sinh }} | Tướng: {{ tinh_ban.tam_truyen.so.tuong }} ({{ tinh_ban.tam_truyen.so.noi_ngoai_chien }}) | Trời/Đất: {{ tinh_ban.tam_truyen.so.thien_dia_chien }} | Thần Sát: {{ tinh_ban.tam_truyen.so.than_sat|join(', ') }} | Âm thần: {{ tinh_ban.tam_truyen.so.am_than }} | Độn: {{ tinh_ban.tam_truyen.so.don_can }} ({{ tinh_ban.tam_truyen.so.don_can_luc_than }} -> {{ tinh_ban.tam_truyen.so.don_can_quan_he }}) | Ứng kỳ: {{ tinh_ban.tam_truyen.so.ung_ky|join(' | ') }}{% if tinh_ban.tam_truyen.so.is_tuan_khong %} [TUẦN KHÔNG: {{ tinh_ban.tam_truyen.so.kv_tinh_chat.chan_gia }} | LẬT THẾ CỜ: Giải Không bằng {{ tinh_ban.tam_truyen.so.giai_khong }}]{% endif %}{% if tinh_ban.tam_truyen.so.is_nhap_mo %} [NHẬP MỘ]{% endif %}{% if tinh_ban.tam_truyen.so.is_chiem_thoi %} [CHIÊM THỜI]{% endif %}{% if tinh_ban.tam_truyen.so.is_nguyet_tuong %} [NGUYỆT TƯỚNG]{% endif %}
+- Trung Truyền (Diễn biến): Chi {{ tinh_ban.tam_truyen.trung.chi }} | Thần: {{ tinh_ban.tam_truyen.trung.luc_than }} | Khí: {{ tinh_ban.tam_truyen.trung.vuong_suy }} | Vòng Đời: {{ tinh_ban.tam_truyen.trung.truong_sinh }} | Tướng: {{ tinh_ban.tam_truyen.trung.tuong }} ({{ tinh_ban.tam_truyen.trung.noi_ngoai_chien }}) | Trời/Đất: {{ tinh_ban.tam_truyen.trung.thien_dia_chien }} | Thần Sát: {{ tinh_ban.tam_truyen.trung.than_sat|join(', ') }} | Âm thần: {{ tinh_ban.tam_truyen.trung.am_than }} | Độn: {{ tinh_ban.tam_truyen.trung.don_can }} ({{ tinh_ban.tam_truyen.trung.don_can_luc_than }} -> {{ tinh_ban.tam_truyen.trung.don_can_quan_he }}) | Ứng kỳ: {{ tinh_ban.tam_truyen.trung.ung_ky|join(' | ') }}{% if tinh_ban.tam_truyen.trung.is_tuan_khong %} [TUẦN KHÔNG: {{ tinh_ban.tam_truyen.trung.kv_tinh_chat.chan_gia }} | LẬT THẾ CỜ: Giải Không bằng {{ tinh_ban.tam_truyen.trung.giai_khong }}]{% endif %}{% if tinh_ban.tam_truyen.trung.is_nhap_mo %} [NHẬP MỘ]{% endif %}{% if tinh_ban.tam_truyen.trung.is_chiem_thoi %} [CHIÊM THỜI]{% endif %}{% if tinh_ban.tam_truyen.trung.is_nguyet_tuong %} [NGUYỆT TƯỚNG]{% endif %}
+- Mạt Truyền (Kết cục): Chi {{ tinh_ban.tam_truyen.mat.chi }} | Thần: {{ tinh_ban.tam_truyen.mat.luc_than }} | Khí: {{ tinh_ban.tam_truyen.mat.vuong_suy }} | Vòng Đời: {{ tinh_ban.tam_truyen.mat.truong_sinh }} | Tướng: {{ tinh_ban.tam_truyen.mat.tuong }} ({{ tinh_ban.tam_truyen.mat.noi_ngoai_chien }}) | Trời/Đất: {{ tinh_ban.tam_truyen.mat.thien_dia_chien }} | Thần Sát: {{ tinh_ban.tam_truyen.mat.than_sat|join(', ') }} | Âm thần: {{ tinh_ban.tam_truyen.mat.am_than }} | Độn: {{ tinh_ban.tam_truyen.mat.don_can }} ({{ tinh_ban.tam_truyen.mat.don_can_luc_than }} -> {{ tinh_ban.tam_truyen.mat.don_can_quan_he }}) | Ứng kỳ: {{ tinh_ban.tam_truyen.mat.ung_ky|join(' | ') }}{% if tinh_ban.tam_truyen.mat.is_tuan_khong %} [TUẦN KHÔNG: {{ tinh_ban.tam_truyen.mat.kv_tinh_chat.chan_gia }} | LẬT THẾ CỜ: Giải Không bằng {{ tinh_ban.tam_truyen.mat.giai_khong }}]{% endif %}{% if tinh_ban.tam_truyen.mat.is_nhap_mo %} [NHẬP MỘ]{% endif %}{% if tinh_ban.tam_truyen.mat.is_chiem_thoi %} [CHIÊM THỜI]{% endif %}{% if tinh_ban.tam_truyen.mat.is_nguyet_tuong %} [NGUYỆT TƯỚNG]{% endif %}
+
+- Tốc độ Truyền: {{ tinh_ban.tam_truyen.tien_thoai if tinh_ban.tam_truyen.tien_thoai else 'Bình thường' }}
+- CHỐT HẠ THÀNH BẠI (Mạt so găng Can Ngày/Ta): {{ tinh_ban.tam_truyen.lat_keo_mat_can }}
+
+* THIÊN ĐỊA BÀN (Bản Đồ Radar 360 Độ - 12 Cung Chiến Lược):
+{% for cung in tinh_ban.thien_dia_ban %}– Cung Địa {{ cung.dia }}: Thiên bàn {{ cung.thien }} giáng lâm. Lục thân: {{ cung.luc_than }} | Khí: {{ cung.vuong_suy }} | Vòng Đời: {{ cung.truong_sinh }} | Khí Địa: {{ cung.thien_dia_chien }} | Tướng: {{ cung.tuong }} | Độn can: {{ cung.don_can }} ({% if cung.don_can != 'Không' %}{{ cung.don_can_luc_than }}{% endif %}) | Vòng Thái Tuế: {{ cung.thai_tue }}{% if cung.than_sat %} | Thần sát: {{ cung.than_sat | join(', ') }}{% endif %}
+  -> Trạng thái: {% if cung.is_tuan_khong %}[TUẦN KHÔNG] {% endif %}{% if cung.is_nhap_mo %}[NHẬP MỘ] {% endif %}{% if cung.is_chiem_thoi %}[CHIÊM THỜI] {% endif %}{% if cung.is_nguyet_tuong %}[NGUYỆT TƯỚNG] {% endif %}{% if cung.is_ban_menh %}[BẢN MỆNH] {% endif %}{% if cung.is_hanh_nien %}[HÀNH NIÊN]{% endif %}{% if not cung.is_tuan_khong and not cung.is_nhap_mo and not cung.is_chiem_thoi and not cung.is_nguyet_tuong and not cung.is_ban_menh and not cung.is_hanh_nien %}[BÌNH THƯỜNG]{% endif %}
+{% endfor %}
+
+{% if tinh_ban.canh_bao_tat_phap %}
+* CẢNH BÁO CỐT LÕI TỪ TẤT PHÁP PHÚ:
+{% for cb in tinh_ban.canh_bao_tat_phap %}- {{ cb }}
+{% endfor %}{% endif %}
+
+=== YÊU CẦU ĐỊNH DẠNG ĐẦU RA CHO AI (OUTPUT FORMAT) ===
+* QUY TẮC PHIÊN DỊCH THUẬT NGỮ SANG KINH DOANH/CUỘC SỐNG (Bắt buộc AI phải áp dụng):
+- Lục Thân: Phụ Mẫu (Hợp đồng, Công ty mẹ, Nền tảng pháp lý, Người chống lưng); Quan Quỷ (Sức ép thị trường, Cơ quan quản lý, Cạnh tranh khắc nghiệt, Rủi ro pháp lý); Thê Tài (Dòng tiền, Vốn, Lợi nhuận, Nguồn lực thực tế); Huynh Đệ (Đối tác chia phần, Đối thủ cùng ngành, Đồng nghiệp gây hao tài); Tử Tôn (Sản phẩm cốt lõi, Giải pháp đột phá, Khách hàng, Nhân sự cấp dưới).
+- 12 Thiên Tướng: Chu Tước (Truyền thông, Đàm phán, Xử lý khủng hoảng PR, Thị phi); Đằng Xà (Biến động ảo, Thay đổi nhân sự đột ngột, Lo âu vô cớ); Câu Trần (Đình trệ dự án, Tranh chấp nội bộ/đất đai); Bạch Hổ (Rủi ro tài chính lớn, Chấn thương, Pháp lý nặng); Huyền Vũ (Lừa đảo ngầm, Thất thoát không rõ nguyên nhân); Thiên Không (Dự án "bánh vẽ", Lời hứa suông); Dịch Mã (Chuyển đổi công tác, Xuất ngoại, Mở rộng thị trường).
+
+Vui lòng trình bày bài luận giải theo cấu trúc rõ ràng sau, sử dụng ngôn ngữ kinh doanh/tâm lý học hiện đại, tuyệt đối không dịch lại thuật ngữ lý thuyết mà phải chuyển hóa thành ý nghĩa thực tiễn dựa trên "Quy Tắc Phiên Dịch" ở trên:
+
+1. BẮT MẠCH TỔNG QUAN (Định vị tình thế):
+- Chỉ ra Dụng Thần (Mục tiêu của câu hỏi) đang ở trạng thái nào (Vượng/Suy/Tuần Không/Mộ) và ánh xạ nó vào ngôn ngữ kinh doanh (ví dụ: Thê Tài Tuần Không = Hụt vốn).
+- Vị thế hiện tại của người hỏi (Chủ) so với Đối tác/Hoàn cảnh (Khách) đang là cửa trên hay cửa dưới dựa vào Tứ Khóa. Cảnh báo ngay nếu rơi vào Phục Ngâm/Phản Ngâm.
+
+2. ĐỌC VỊ ĐỐI TÁC VÀ LỰC LƯỢNG NGẦM (Nghệ thuật đàm phán):
+- Phân tích Động Lực Học Tứ Khóa (Giao xa) để xem đối tác có thiện chí thật hay đang giăng bẫy.
+- Nhìn vào Tương Quan Lực Lượng Ngầm: Nếu trục Chủ-Khách có "Hình/Hại/Phá" thì vạch trần mâu thuẫn ẩn giấu; nếu "Hợp" thì tận dụng để hợp tác.
+- Vạch trần động cơ thông qua Âm Thần và Độn Can của Sơ Truyền, kết hợp các Cát/Hung Thần Sát (đặc biệt lưu ý Dịch Mã, Chu Tước, Huyền Vũ).
+
+3. QUÉT VỆ TINH TOÀN CẢNH (Khai thác Thiên Địa Bàn):
+- Định vị Dòng tiền/Cơ hội (Thê Tài) đang nằm ở đâu, có bị Tuần Không/Nhập Mộ không?
+- Định vị Quý Nhân (Mối quan hệ/Sự giúp đỡ) và Lộc Thần đang ở cung nào?
+- Đánh giá cung Bản Mệnh và Hành Niên của người hỏi: Họ đang bị kẹt (Bạch Hổ, Thái Tuế, Tuần Không) hay đang có đà phát triển (Thanh Long, Lục Hợp, Trường Sinh)?
+
+4. DỰ BÁO LỘ TRÌNH PHÁT TRIỂN (Tam Truyền):
+- Tóm tắt ngắn gọn chặng đường từ Khởi đầu -> Diễn biến -> Kết quả. Nêu bật Cục Diện Tam Truyền (nếu có) để thấy sức mạnh xu hướng (ví dụ: Tam Hợp Cục là huy động được đội nhóm mạnh).
+- Nếu có Tuần Không: Bắt buộc phải chỉ rõ "Lật thế cờ Không Vong" (Điền Thực/Xung Không) rơi vào thời điểm nào để phục kích cơ hội, không được coi Không Vong là ngõ cụt. Nêu rõ Trục Vòng Đời (Sơ vs Mạt) để xem đầu xuôi đuôi lọt hay gãy gánh.
+- Đặc biệt chú trọng cú "Chốt hạ" ở Mạt Truyền so với Bản mệnh và Can Ngày.
+
+5. LỜI KHUYÊN CHIẾN LƯỢC & ACTION PLAN:
+- Đưa ra 2-3 gạch đầu dòng hướng dẫn hành động cụ thể (VD: Nên lùi lại chờ Xung Không, Nên tung vốn vào tháng Điền Thực, Tránh đối đầu vì có "Hình" ngầm...).
+- Tổng hợp các mốc thời gian Ứng Kỳ quan trọng để hành động hoặc án binh. Mở đường sống cho người hỏi nếu quẻ hung.</textarea>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    async function getLocation() {
+        const status = document.getElementById("gps-status");
+        status.innerText = "📍 Đang dò tìm tinh tượng ngầm...";
+        
+        try {
+            // Sử dụng API IP để lấy tọa độ ngầm (Không hiện Popup xin quyền)
+            const response = await fetch('https://get.geojs.io/v1/ip/geo.json');
+            if (!response.ok) throw new Error("Mất kết nối thiên văn");
+            
+            const data = await response.json();
+            
+            document.getElementById("lat").value = data.latitude;
+            document.getElementById("lon").value = data.longitude;
+            
+            let tzOffset = -(new Date().getTimezoneOffset() / 60);
+            document.getElementById("tz_offset").value = tzOffset;
+            
+            status.innerHTML = `✅ Đã khóa tọa độ ngầm: ${data.city || 'Khu vực'}, ${data.country} (UTC${tzOffset >= 0 ? '+' : ''}${tzOffset})`;
+            status.style.color = "#27ae60";
+        } catch (error) {
+            status.innerText = "❌ Không dò được IP, dùng mặc định Kinh đô (Hà Nội).";
+            status.style.color = "#c0392b";
+        }
+    }
+
+    function setCurrentTime() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        
+        const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}`;
+        document.getElementById('thoi_gian_que').value = formattedDate;
+    }
+
+    window.onload = function() {
+        const timeInput = document.getElementById('thoi_gian_que');
+        if (!timeInput.value) {
+            setCurrentTime();
+        }
+        // Tự động gọi GPS khi tải trang
+        getLocation();
+    }
+</script>
+<script>
+    // Phép thuật Copy nhanh cho AI
+    function copyPrompt() {
+        var copyText = document.getElementById("prompt_text");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); /* Dành cho mobile */
+        
+        navigator.clipboard.writeText(copyText.value).then(function() {
+            var btn = document.getElementById("btn-copy");
+            btn.innerHTML = "✅ Đã Copy thành công!";
+            btn.style.backgroundColor = "#27ae60";
+            
+            // Tự nhả lại nút cũ sau 3 giây
+            setTimeout(function() {
+                btn.innerHTML = "📋 Sao chép nhanh cho AI";
+                btn.style.backgroundColor = "#8e44ad";
+            }, 3000);
+        });
+    }
+</script>
+</body>
+</html>

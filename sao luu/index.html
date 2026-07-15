@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Lục Nhâm Đại Độn Pro</title>
+    <style>
+        :root { --bg-color: #f4f4f9; --border: #c4b59d; --text: #333; }
+        body { font-family: Arial, sans-serif; background: var(--bg-color); color: var(--text); padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        .form-box { background: #faf8f2; padding: 15px; border-radius: 8px; border: 1px dashed var(--border); margin-bottom: 20px; text-align: center; }
+        .form-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; margin-bottom: 15px; }
+        .input-group { display: flex; flex-direction: column; text-align: left; }
+        .input-group label { font-weight: bold; font-size: 0.9em; margin-bottom: 5px; color: #555; }
+        .input-group-row { display: flex; gap: 5px; align-items: stretch; }
+        .input-group input, .input-group select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 1em; }
+        
+        .btn-now { background: #eaddcf; color: #555; border: 1px solid #ccc; cursor: pointer; border-radius: 4px; padding: 0 10px; font-weight: bold; font-size: 0.9em; transition: 0.2s;}
+        .btn-now:hover { background: #c4b59d; color: white; border-color: #8b7355;}
+
+        .btn-submit { padding: 10px 25px; background: #8b7355; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 1em; transition: 0.3s; }
+        .btn-submit:hover { background: #6b5840; }
+
+        .lndd-grid { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, minmax(110px, auto)); gap: 8px; margin-top: 20px; }
+        .cell { border: 1px solid var(--border); border-radius: 5px; padding: 5px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; position: relative; background: #fffdf9;}
+        .top-info { font-size: 0.75em; color: #555; }
+        .thien-ban { font-size: 1.6em; font-weight: bold; margin: 5px 0; }
+        .dia-ban { font-size: 0.9em; font-weight: bold; border-top: 1px dashed var(--border); padding-top: 3px; }
+        .kv-mark { color: red; font-size: 0.5em; vertical-align: super; font-weight: bold;}
+        
+        .color-Mộc { color: #2e7d32; } .color-Hỏa { color: #c62828; } .color-Thổ { color: #795548; } .color-Kim { color: #ef6c00; } .color-Thủy { color: #1565c0; }
+        .vuong-suy-tag { font-size: 0.7em; padding: 2px 4px; border-radius: 3px; font-weight: bold; background: #eee;}
+        .tag-VƯỢNG, .tag-TƯỚNG { background: #d4edda; color: #155724; }
+        .tag-TỬ, .tag-TÙ { background: #f8d7da; color: #721c24; }
+        .tag-NỘI { color: #c62828; font-weight: bold; font-size: 0.7em;}
+        .tag-NGOẠI { color: #ef6c00; font-weight: bold; font-size: 0.7em;}
+
+        .pos-Tỵ { grid-area: 1/1; } .pos-Ngọ { grid-area: 1/2; } .pos-Mùi { grid-area: 1/3; } .pos-Thân { grid-area: 1/4; }
+        .pos-Thìn { grid-area: 2/1; } .pos-Dậu { grid-area: 2/4; }
+        .pos-Mão { grid-area: 3/1; } .pos-Tuất { grid-area: 3/4; }
+        .pos-Dần { grid-area: 4/1; } .pos-Sửu { grid-area: 4/2; } .pos-Tý { grid-area: 4/3; } .pos-Hợi { grid-area: 4/4; }
+
+        .trung-cung { grid-area: 2/2 / 4/4; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 10px; padding: 5px; }
+        .tc-box { border: 1px dashed var(--border); background: #faf8f2; border-radius: 5px; padding: 10px; font-size: 0.9em;}
+        .tc-title { font-weight: bold; color: #8b7355; text-align: center; border-bottom: 1px solid #ddd; margin-bottom: 5px; padding-bottom: 3px;}
+        
+        .tk-table { width: 100%; text-align: center; font-size: 0.85em; border-collapse: collapse;}
+        .tk-table th, .tk-table td { padding: 3px; }
+        
+        /* Cải tiến hiển thị Tứ Khóa theo Cửu Tông Môn */
+        .tu-khoa-flex { display: flex; flex-direction: row-reverse; justify-content: space-around; text-align: center; margin-top: 10px;}
+        .khoa-item { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .khoa-item .thien { font-weight: bold; font-size: 1.4em; }
+        .khoa-item .dia { font-weight: bold; font-size: 1.2em; }
+        .sinh-khac-tag { font-size: 0.75em; padding: 2px; color: #c62828; font-weight: bold; }
+        
+        /* Cải tiến hiển thị Tam Truyền */
+        .tam-truyen-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .truyen-row { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px dashed #ccc; padding-bottom: 5px; }
+        
+        .tat-phap-box { grid-column: span 2; background: #fff3cd; border-left: 4px solid #856404; padding: 10px; border-radius: 3px; font-size: 0.85em;}
+        .tat-phap-box h4 { margin: 0 0 5px 0; color: #856404;}
+
+        .ai-prompt-box { margin-top: 30px; background: #e8f4fd; border-left: 4px solid #2980b9; padding: 15px; border-radius: 4px; }
+        .btn-copy { background: #2980b9; color: white; border: none; padding: 8px 15px; cursor: pointer; border-radius: 3px; font-weight: bold;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 style="text-align:center; color:#8b7355; margin-top:0;">TINH BÀN LỤC NHÂM ĐẠI SƯ</h2>
+    
+    <div class="form-box">
+        <form method="POST">
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Thời gian gieo quẻ (*)</label>
+                    <div class="input-group-row">
+                        <input type="datetime-local" id="thoi_gian_que" name="thoi_gian_que" required>
+                        <button type="button" class="btn-now" onclick="setNowQue()" title="Chọn nhanh giờ hiện tại">📍 Hiện tại</button>
+                        <select name="lich_que">
+                            <option value="duong">Dương Lịch</option>
+                            <option value="am">Âm Lịch</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Thời gian sinh (Tùy chọn)</label>
+                    <div class="input-group-row">
+                        <input type="datetime-local" name="thoi_gian_sinh">
+                        <select name="lich_sinh">
+                            <option value="duong">Dương Lịch</option>
+                            <option value="am">Âm Lịch</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Giới tính</label>
+                    <select name="gioi_tinh" style="width: 100%;">
+                        <option value="Nam">Nam</option>
+                        <option value="Nữ">Nữ</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn-submit">LẬP QUẺ LỤC NHÂM</button>
+        </form>
+    </div>
+
+    {% if tinh_ban %}
+    <div class="lndd-grid">
+        
+        {% set cung_map = ['Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Thìn', 'Dậu', 'Mão', 'Tuất', 'Dần', 'Sửu', 'Tý', 'Hợi'] %}
+        {% for dia in cung_map %}
+            {% set data = tinh_ban.thien_dia_ban[dia] %}
+            <div class="cell pos-{{ dia }}">
+                <div class="top-info">
+                    {{ data.tuong }} <br>
+                    <span style="color:#2980b9">{{ data.loai_than }}</span><br>
+                    {% if data.than_sat %} 
+                        {% for sat in data.than_sat %}
+                            {% if sat == "Tuần Không" %}
+                                <span style="color:red; font-weight:bold;">{{ sat }}</span>
+                            {% else %}
+                                {{ sat }}
+                            {% endif %}{% if not loop.last %}, {% endif %}
+                        {% endfor %}<br>
+                    {% endif %}
+                    {{ data.thai_tue }}
+                </div>
+                <div class="thien-ban color-{{ data.ngu_hanh }}">
+                    {{ data.thien }}
+                    {% if data.thien in tinh_ban.khong_vong.ngay %}<span class="kv-mark">〇</span>{% endif %}
+                </div>
+                <div class="dia-ban">
+                    {{ dia }}
+                    {% if dia in tinh_ban.khong_vong.ngay %}<span class="kv-mark">〇</span>{% endif %}
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="trung-cung">
+            
+            <div class="tc-box" id="c1">
+                <div class="tc-title">THỜI KHÓA ({{ tinh_ban.nguyen }})</div>
+                <div style="font-size: 0.8em; text-align:center; color:#666; margin-bottom:5px;">
+                    Nguyệt Kiến (Đo vượng suy): Tháng {{ tinh_ban.nguyet_kien }}
+                </div>
+                <table class="tk-table">
+                    <tr><th>NĂM</th><th>THÁNG</th><th>NGÀY</th><th>GIỜ</th></tr>
+                    <tr>
+                        <td>{{ tinh_ban.tu_tru.nam }}</td><td>{{ tinh_ban.tu_tru.thang }}</td>
+                        <td>{{ tinh_ban.tu_tru.ngay }}</td><td>{{ tinh_ban.tu_tru.gio }}</td>
+                    </tr>
+                </table>
+
+                {% if tinh_ban.sinh_than %}
+                <div class="tc-title" style="margin-top: 12px; color: #2980b9;">BẢN MỆNH ({{ tinh_ban.sinh_than.gioi_tinh }})</div>
+                <table class="tk-table">
+                    <tr>
+                        <td>{{ tinh_ban.sinh_than.tu_tru.nam }}</td><td>{{ tinh_ban.sinh_than.tu_tru.thang }}</td>
+                        <td>{{ tinh_ban.sinh_than.tu_tru.ngay }}</td><td>{{ tinh_ban.sinh_than.tu_tru.gio }}</td>
+                    </tr>
+                </table>
+                <div style="font-size: 0.85em; text-align: center; margin-top: 5px; color: #555;">
+                    Nhật Chủ: <strong class="color-{{ tinh_ban.sinh_than.nhat_chu_hanh }}">{{ tinh_ban.sinh_than.nhat_chu_can }} ({{ tinh_ban.sinh_than.nhat_chu_hanh }})</strong>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="tc-box" id="c2" style="text-align:center; display: flex; flex-direction: column; justify-content: center;">
+                <div class="tc-title">NGUYỆT TƯỚNG</div>
+                <div style="font-size:2.5em; font-weight:bold; color:#ef6c00; margin:10px 0;">{{ tinh_ban.nguyet_tuong }}</div>
+                <div style="color:#555; font-size:0.9em;">(Nguồn sáng xoay Thiên Bàn)</div>
+            </div>
+
+            <div class="tc-box" id="c3">
+                <div class="tc-title">TỨ KHÓA</div>
+                <div class="tu-khoa-flex">
+                    {% set labels = ['Can Nhật', 'Can Âm', 'Chi Nhật', 'Chi Âm'] %}
+                    {% for i in range(3, -1, -1) %}
+                        {% set khoa = tinh_ban.tu_khoa[i] %}
+                        <div class="khoa-item">
+                            <div style="font-weight:bold; color:#8b7355; margin-bottom:5px; font-size:0.85em;">Khóa {{i+1}}<br>({{ labels[i] }})</div>
+                            <div style="font-size:0.75em; color:#666; margin-bottom:3px; min-height: 30px;">
+                                {{ khoa.tuong }} <br>
+                                {% if "NỘI CHIẾN" in khoa.noi_ngoai_chien %}<span class="tag-NỘI">NỘI</span>
+                                {% elif "NGOẠI CHIẾN" in khoa.noi_ngoai_chien %}<span class="tag-NGOẠI">NGOẠI</span>{% endif %}
+                            </div>
+                            
+                            <div class="thien color-{{ tinh_ban.thien_dia_ban[khoa.tren].ngu_hanh }}">
+                                {{ khoa.tren }}
+                                {% if khoa.tren in tinh_ban.khong_vong.ngay %}<span class="kv-mark">〇</span>{% endif %}
+                            </div>
+                            
+                            <div class="sinh-khac-tag">{{ khoa.sinh_khac }}</div>
+                            
+                            <div class="dia">
+                                {{ khoa.duoi }}
+                                {% if khoa.duoi in tinh_ban.khong_vong.ngay %}<span class="kv-mark">〇</span>{% endif %}
+                            </div>
+                            
+                            <div style="font-size:0.8em; color:#2980b9; margin-top:3px;">{{ khoa.luc_than }}</div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="tc-box" id="c4">
+                <div class="tc-title">TAM TRUYỀN <br><span style="font-size: 0.8em; color: #c62828;">Cửu Tông Môn: [{{ tinh_ban.tam_truyen.ten_phap }}]</span></div>
+                <div class="tam-truyen-list">
+                    {% for truyen, label in [("so", "Sơ (Phát Dụng)"), ("trung", "Trung (Diễn Biến)"), ("mat", "Mạt (Kết Cục)")] %}
+                    {% set data = tinh_ban.tam_truyen[truyen] %}
+                    <div class="truyen-row">
+                        <div style="flex: 1; font-weight: bold; color: #555; font-size: 0.9em;">{{ label }}</div>
+                        <div style="flex: 1; text-align: center;">
+                            <span class="color-{{ tinh_ban.thien_dia_ban[data.chi].ngu_hanh }}" style="font-size: 1.4em; font-weight: bold;">{{ data.chi }}</span>
+                            {% if data.chi in tinh_ban.khong_vong.ngay %}<span class="kv-mark">〇</span>{% endif %}
+                        </div>
+                        <div style="flex: 1.5; text-align: right; font-size: 0.8em; line-height: 1.3;">
+                            <span class="vuong-suy-tag tag-{{ data.vuong_suy }}">{{ data.vuong_suy }}</span>
+                            <br><span style="color:#666;">{{ data.tuong }} | {{ data.luc_than }}</span>
+                            {% if "NỘI CHIẾN" in data.noi_ngoai_chien %}<br><span class="tag-NỘI">⚠️ {{ data.noi_ngoai_chien }}</span>
+                            {% elif "NGOẠI CHIẾN" in data.noi_ngoai_chien %}<br><span class="tag-NGOẠI">⚠️ {{ data.noi_ngoai_chien }}</span>{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if tinh_ban.canh_bao_tat_phap %}
+            <div class="tat-phap-box">
+                <h4>📜 TẤT PHÁP PHÚ (Thế Cục)</h4>
+                <ul style="margin:0; padding-left:20px;">
+                    {% for canh_bao in tinh_ban.canh_bao_tat_phap %}
+                        <li>{{ canh_bao }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <div class="ai-prompt-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="margin:0; color:#2980b9;">🤖 Dữ liệu cho AI Luận Giải (Deep Analysis)</h3>
+            <button class="btn-copy" onclick="copyPrompt()">📋 Sao Chép</button>
+        </div>
+        <textarea id="ai-prompt-text" style="width:100%; height:200px; padding:10px; font-family:monospace; border:1px solid #ccc; border-radius:4px;" readonly>
+Hãy đóng vai Tông Sư Lục Nhâm Đại Độn, kết hợp tư duy chiến lược hiện đại để luận giải quẻ này. 
+Sự việc người hỏi đang quan tâm là: [NHẬP CHỦ ĐỀ/CÂU HỎI CỦA BẠN VÀO ĐÂY - Vd: Công việc sắp tới có thuận lợi không?]
+
+* BỐI CẢNH THỜI GIAN:
+- Tứ trụ gieo quẻ: Năm {{ tinh_ban.tu_tru.nam }} - Tháng {{ tinh_ban.tu_tru.thang }} - Ngày {{ tinh_ban.tu_tru.ngay }} - Giờ {{ tinh_ban.tu_tru.gio }}
+- Nguyệt Tướng: {{ tinh_ban.nguyet_tuong }} | Nguyệt Kiến: Tháng {{ tinh_ban.nguyet_kien }}
+- Tuần Không: {{ tinh_ban.khong_vong.ngay | join(', ') }}
+- Cửu Tông Môn (Cục thế): {{ tinh_ban.tam_truyen.ten_phap }}
+{% if tinh_ban.sinh_than %}* BẢN MỆNH NGƯỜI HỎI: Nhật Chủ {{ tinh_ban.sinh_than.nhat_chu_can }} ({{ tinh_ban.sinh_than.nhat_chu_hanh }}), Mệnh {{ tinh_ban.sinh_than.menh }}{% endif %}
+
+* TỨ KHÓA (Phân tích Chủ/Khách - Nội/Ngoại):
+{% set labels = ['Can Nhật (Bản thân)', 'Can Âm (Người dính líu)', 'Chi Nhật (Sự việc/Đối tác)', 'Chi Âm (Bản chất sự việc)'] %}
+{% for i in range(3, -1, -1) %}- Khóa {{i+1}} ({{ labels[i] }}): Thiên {{ tinh_ban.tu_khoa[i].tren }} {{ tinh_ban.tu_khoa[i].sinh_khac }} Địa {{ tinh_ban.tu_khoa[i].duoi }} | Thần/Tướng: {{ tinh_ban.tu_khoa[i].luc_than }}, {{ tinh_ban.tu_khoa[i].tuong }} ({{ tinh_ban.tu_khoa[i].noi_ngoai_chien }})
+{% endfor %}
+* TAM TRUYỀN (Tiến trình Sự việc):
+{% for truyen, label in [("so", "Sơ Truyền (Bắt đầu)"), ("trung", "Trung Truyền (Diễn biến)"), ("mat", "Mạt Truyền (Kết cục)")] %}{% set data = tinh_ban.tam_truyen[truyen] %}- {{ label }}: Chi {{ data.chi }} | Khí: {{ data.vuong_suy }} | Thần/Tướng: {{ data.luc_than }}, {{ data.tuong }} ({{ data.noi_ngoai_chien }})
+{% endfor %}
+{% if tinh_ban.canh_bao_tat_phap %}* TẤT PHÁP PHÚ (Cảnh báo thế cục):
+{% for canh_bao in tinh_ban.canh_bao_tat_phap %}- {{ canh_bao }}
+{% endfor %}{% endif %}
+
+YÊU CẦU LUẬN GIẢI DÀNH CHO AI:
+1. Đánh giá Mức độ Thuận lợi/Rủi ro dựa trên Dụng Thần của Chủ đề được hỏi.
+2. Bóc trần các nguy cơ tiềm ẩn thông qua sự Sinh/Khắc của Tứ Khóa và thuyết Nội/Ngoại chiến.
+3. Đánh giá kết cục dựa trên Vượng/Suy của Tam Truyền và các cảnh báo từ Tất Pháp Phú.
+4. Đưa ra lời khuyên thực chiến (Nên Tiến công, Thoái lui, Đàm phán, hay Chờ đợi?). Lời khuyên cần rõ ràng, sắc bén và dễ hiểu cho người hiện đại.
+        </textarea>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    function setNowQue() {
+        var now = new Date();
+        var tzOffset = now.getTimezoneOffset() * 60000;
+        var localISOTime = (new Date(now - tzOffset)).toISOString().slice(0, 16);
+        document.getElementById('thoi_gian_que').value = localISOTime;
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        var inputQue = document.getElementById('thoi_gian_que');
+        if (!inputQue.value) setNowQue();
+    });
+    function copyPrompt() {
+        var copyText = document.getElementById("ai-prompt-text");
+        copyText.select();
+        document.execCommand("copy");
+        var btn = document.querySelector('.btn-copy');
+        btn.innerHTML = "✅ Đã Copy!";
+        setTimeout(function(){ btn.innerHTML = "📋 Sao Chép"; }, 2000);
+    }
+</script>
+
+</body>
+</html>

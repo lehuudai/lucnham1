@@ -1,0 +1,26 @@
+# ==============================================================================
+# DANH SÁCH THƯ VIỆN CẦN CÀI ĐẶT CHO HỆ THỐNG LỤC NHÂM ĐẠI ĐỘN (REQUIREMENTS.TXT)
+# ==============================================================================
+# Cách cài đặt: Mở Terminal hoặc Command Prompt tại thư mục chứa file này và gõ:
+# pip install -r requirements.txt
+# ==============================================================================
+
+# 1. Framework Web & Backend
+# Flask dùng để dựng máy chủ web cục bộ (Local Server) và xử lý định tuyến (Routing)
+Flask>=3.0.0
+
+# 2. Thư viện Chuyển đổi Lịch Pháp (Âm/Dương lịch)
+# Dùng để quy đổi ngày giờ Âm lịch sang Dương lịch chuẩn xác cho việc gieo quẻ
+lunarcalendar>=0.0.9
+
+# 3. Thư viện Tính toán Thiên văn học
+# PyEphem giúp tính toán vị trí Mặt Trời, Nguyệt Tướng, tọa độ biểu kiến (RA/Dec)
+# và phân biệt Trú/Dạ (Ban ngày / Ban đêm) chính xác theo tọa độ địa lý IP
+ephem>=4.1.5
+
+# ==============================================================================
+# GHI CHÚ: CÁC THƯ VIỆN CÓ SẴN TRONG PYTHON (KHÔNG CẦN CÀI ĐẶT THÊM)
+# - sqlite3: Quản lý và kết nối cơ sở dữ liệu SQLite (lucnham_history.db)
+# - json: Xử lý và nén/bung nén cấu trúc dữ liệu mâm tinh bàn
+# - datetime, math: Xử lý thời gian và tính toán toán học
+# ==============================================================================

@@ -1,0 +1,1391 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2867
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 .AppleSystemUIFontMonospaced-Regular;\f1\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\deftab560
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\fs24 \cf0 /**\
+ * L\'e1\'bb\'a5c Nh\uc0\u258 \'a2m \'c4\u144 \'e1\'ba\'a1i \'c4\u144 \'e1\'bb\'99n \'e2\'80\'94 UI Render\
+ * Giao di\'e1\'bb\'87n theo motip phongthuythanglong.vn\
+ */\
+(function()\{\
+    'use strict';\
+\
+    // ============================================================\
+    //  SET CURRENT TIME\
+    // ============================================================\
+    window.lnddSetNow = function() \{\
+        var now = new Date();\
+        document.getElementById('lndd-view-year').value = now.getFullYear();\
+        document.getElementById('lndd-view-month').value = now.getMonth() + 1;\
+        document.getElementById('lndd-view-day').value = now.getDate();\
+        document.getElementById('lndd-view-hour').value = now.getHours();\
+        document.getElementById('lndd-view-minute').value = now.getMinutes();\
+        document.getElementById('lndd-view-second').value = now.getSeconds();\
+    \};\
+\
+    // ============================================================\
+    //  LAP QUE\
+    // ============================================================\
+    window.lnddLapQue = function() \{\
+        // Gather view time\
+        var vy = parseInt(document.getElementById('lndd-view-year').value) || 2026;\
+        var vm = parseInt(document.getElementById('lndd-view-month').value) || 1;\
+        var vd = parseInt(document.getElementById('lndd-view-day').value) || 1;\
+        var vh = parseInt(document.getElementById('lndd-view-hour').value) || 0;\
+        var vmin = parseInt(document.getElementById('lndd-view-minute').value) || 0;\
+        var vsec = parseInt(document.getElementById('lndd-view-second').value) || 0;\
+\
+        var viewDate = new Date(vy, vm - 1, vd);\
+\
+        // Gather birth info\
+        var name = (document.getElementById('lndd-name').value || '').trim() || 'Kh\uc0\u258 \'b4ng r\u258 \'b5';\
+        var gender = document.getElementById('lndd-gender').value || 'Nam';\
+        var byRaw = document.getElementById('lndd-birth-year').value;\
+        var birthDate = null, bh = 0, bmin = 0;\
+        var hasBirth = byRaw && byRaw.trim() !== '';\
+        if (hasBirth) \{\
+            var by = parseInt(byRaw) || 2000;\
+            var bm = parseInt(document.getElementById('lndd-birth-month').value) || 1;\
+            var bd = parseInt(document.getElementById('lndd-birth-day').value) || 1;\
+            bh = parseInt(document.getElementById('lndd-birth-hour').value) || 0;\
+            bmin = parseInt(document.getElementById('lndd-birth-minute').value) || 0;\
+            birthDate = new Date(by, bm - 1, bd);\
+        \}\
+\
+        // Calculate\
+        var result = LNDD_Engine.calculate(viewDate, vh, vmin, birthDate, bh, bmin, gender);\
+        result._name = name;\
+        result._gender = gender;\
+        result._viewSecond = vsec;\
+        result._hasBirth = hasBirth;\
+        result._question = (document.getElementById('lndd-question').value || '').trim();\
+\
+        // Render\
+        var area = document.getElementById('lndd-result-area');\
+        area.style.display = 'block';\
+        area.innerHTML = renderResult(result);\
+        area.scrollIntoView(\{ behavior: 'smooth', block: 'start' \});\
+    \};\
+\
+    // ============================================================\
+    //  RENDER RESULT\
+    // ============================================================\
+    function renderResult(r) \{\
+        var html = '';\
+        html += renderHeaderInfo(r);\
+        html += renderMainGrid(r);\
+        html += renderPhoneBar();\
+        html += renderRawText(r);\
+        return html;\
+    \}\
+\
+    // ============================================================\
+    //  HEADER INFO\
+    // ============================================================\
+    function renderHeaderInfo(r) \{\
+        var fp = r.fourPillars;\
+        var batTu = LNDD_Engine.formatCanChi(fp.year) + ', ' +\
+                    LNDD_Engine.formatCanChi(fp.month) + ', ' +\
+                    LNDD_Engine.formatCanChi(fp.day) + ', ' +\
+                    LNDD_Engine.formatCanChi(fp.hour);\
+\
+        var kvAll = [];\
+        kvAll.push(LNDD_Engine.getChiName(r.kongWang.year[0]) + ' ' + LNDD_Engine.getChiName(r.kongWang.year[1]));\
+        kvAll.push(LNDD_Engine.getChiName(r.kongWang.month[0]) + ' ' + LNDD_Engine.getChiName(r.kongWang.month[1]));\
+        kvAll.push(LNDD_Engine.getChiName(r.kongWang.day[0]) + ' ' + LNDD_Engine.getChiName(r.kongWang.day[1]));\
+        kvAll.push(LNDD_Engine.getChiName(r.kongWang.hour[0]) + ' ' + LNDD_Engine.getChiName(r.kongWang.hour[1]));\
+\
+        var dd = String(r.viewDate.getDate()).padStart(2, '0');\
+        var mm = String(r.viewDate.getMonth() + 1).padStart(2, '0');\
+        var yyyy = r.viewDate.getFullYear();\
+        var hh = String(r.viewHour).padStart(2, '0');\
+        var mi = String(r.viewMinute).padStart(2, '0');\
+        var ss = String(r._viewSecond || 0).padStart(2, '0');\
+        var timeStr = hh + 'h' + mi + '\\'' + ss + '" \'e2\'80\'94 Ng\uc0\u258 \'a0y ' + dd + '/' + mm + '/' + yyyy;\
+\
+  // --- Render HTML ---\
+    var html = '<div class="lndd-header-info"><div class="lndd-info-grid">';\
+    \
+    // Left column\
+    html += '<div class="lndd-info-left">';\
+    html += '<div class="lndd-info-row"><span class="lndd-info-label">H\'e1\'bb\uc0\u141  t\u258 \'aan:</span> <span class="lndd-highlight">' + r._name + '</span></div>';\
+    html += '<div class="lndd-info-row"><span class="lndd-info-label">Gi\'e1\'bb\'9bi T\uc0\u258 \'adnh:</span> ' + (r._gender || 'Nam') + '</div>';\
+    \
+    if (r._hasBirth && r.birthPillars) \{\
+        html += '<div class="lndd-info-row"><span class="lndd-info-label">B\uc0\u258 \'a1t T\'e1\'bb\'b1 (Sinh Th\'e1\'ba\'a7n):</span> <span class="lndd-highlight">';\
+        html += LNDD_Engine.formatCanChi(r.birthPillars.year) + ', ';\
+        html += LNDD_Engine.formatCanChi(r.birthPillars.month) + ', ';\
+        html += LNDD_Engine.formatCanChi(r.birthPillars.day) + ', ';\
+        html += LNDD_Engine.formatCanChi(r.birthPillars.hour);\
+        html += '</span></div>';\
+        html += '<div class="lndd-info-row"><span class="lndd-info-label">Kh\uc0\u258 \'b4ng Vong (Sinh Th\'e1\'ba\'a7n):</span> <span class="lndd-kv-text">';\
+        html += LNDD_Engine.getChiName(r.birthKW.year[0]) + ' ' + LNDD_Engine.getChiName(r.birthKW.year[1]) + ', ';\
+        html += LNDD_Engine.getChiName(r.birthKW.month[0]) + ' ' + LNDD_Engine.getChiName(r.birthKW.month[1]) + ', ';\
+        html += LNDD_Engine.getChiName(r.birthKW.day[0]) + ' ' + LNDD_Engine.getChiName(r.birthKW.day[1]) + ', ';\
+        html += LNDD_Engine.getChiName(r.birthKW.hour[0]) + ' ' + LNDD_Engine.getChiName(r.birthKW.hour[1]);\
+        html += '</span></div>';\
+    \} else \{\
+        html += '<div class="lndd-info-row"><span class="lndd-info-label">B\uc0\u258 \'a1t T\'e1\'bb\'b1 (Sinh Th\'e1\'ba\'a7n):</span> <span style="color:#999;font-style:italic">Ch\'c6\'b0a nh\'e1\'ba\'adp ng\u258 \'a0y sinh</span></div>';\
+    \}\
+    html += '</div>';\
+    \
+    // Right column\
+    html += '<div class="lndd-info-right">';\
+    html += '<div class="lndd-time-display">' + timeStr + ' (D\'c6\'b0\'c6\'a1ng L\'e1\'bb\'8bch)</div>';\
+    html += '<div class="lndd-info-row"><span class="lndd-info-label">Ti\'e1\'ba\'bft:</span> <span class="lndd-highlight">' + r.solarTerm.name + '</span>';\
+    html += ' &nbsp; <span class="lndd-info-label">Nguy\uc0\u258 \'aan:</span> <span class="lndd-highlight">' + r.yuanName + '</span></div>';\
+    html += '<div class="lndd-info-row"><span class="lndd-info-label">Nguy\'e1\'bb\'87t T\'c6\'b0\'e1\'bb\'9bng:</span> <span class="lndd-nt-value">' + LNDD_Engine.getChiName(r.nguyetTuong.branch) + ' \'e2\'80\'94 ' + r.nguyetTuong.name + '</span></div>';\
+    html += '<div class="lndd-info-row"><span class="lndd-info-label">Qu\uc0\u258 \'bd Nh\u258 \'a2n:</span> ' + LNDD_Engine.getChiName(r.quyNhanBranch) + ' (' + (r.isDaytime ? 'Ng\u258 \'a0y qu\u258 \'bd' : '\'c4\u144 \u258 \'aam qu\u258 \'bd') + ')</div>';\
+    html += '</div>';\
+    \
+    html += '</div></div>';\
+        return html;\
+    \}\
+\
+    // ============================================================\
+    //  MAIN GRID (4\uc0\u258 \'974 Thi\u258 \'aan \'c4\u144 \'e1\'bb\'8ba B\u258 \'a0n + Center)\
+    // ============================================================\
+\
+    // Grid layout:\
+    // Row 0: T\'e1\'bb\'b5(5)  Ng\'e1\'bb\uc0\u141 (6)  M\u258 \'b9i(7)  Th\u258 \'a2n(8)\
+    // Row 1: Th\uc0\u258 \'acn(4)  [CENTER]        D\'e1\'ba\'adu(9)\
+    // Row 2: M\uc0\u258 \'a3o(3)   [CENTER]        Tu\'e1\'ba\'a5t(10)\
+    // Row 3: D\'e1\'ba\'a7n(2)  S\'e1\'bb\'adu(1) T\uc0\u258 \'bd(0)   H\'e1\'bb\'a3i(11)\
+\
+    var GRID_LAYOUT = [\
+        [5,   6,    7,    8],\
+        [4,   'c1', 'c2', 9],\
+        [3,   'c3', 'c4', 10],\
+        [2,   1,    0,    11]\
+    ];\
+\
+    function renderMainGrid(r) \{\
+        var html = '<div class="lndd-main-grid-wrapper">';\
+\
+        // Direction labels \'e2\'80\'94 top\
+        html += '<div class="lndd-dir-top">';\
+        html += '<span></span><span>T\'e1\'bb\'b5</span><span>Ng\'e1\'bb\uc0\u141 </span><span>M\u258 \'b9i</span><span></span>';\
+        html += '</div>';\
+\
+        html += '<div class="lndd-grid-container">';\
+        // Direction labels \'e2\'80\'94 left\
+        html += '<div class="lndd-dir-left">';\
+        html += '<span>Th\uc0\u258 \'acn</span><span>M\u258 \'a3o</span><span>D\'e1\'ba\'a7n</span>';\
+        html += '</div>';\
+\
+        // The 4\uc0\u258 \'974 grid\
+        html += '<div class="lndd-grid-4x4">';\
+        for (var row = 0; row < 4; row++) \{\
+            for (var col = 0; col < 4; col++) \{\
+                var cell = GRID_LAYOUT[row][col];\
+                if (typeof cell === 'number') \{\
+                    html += renderPalaceCell(r, cell);\
+                \} else \{\
+                    html += renderCenterCell(r, cell);\
+                \}\
+            \}\
+        \}\
+        html += '</div>';\
+\
+        // Direction labels \'e2\'80\'94 right\
+        html += '<div class="lndd-dir-right">';\
+        html += '<span>Th\uc0\u258 \'a2n</span><span>D\'e1\'ba\'adu</span><span>Tu\'e1\'ba\'a5t</span>';\
+        html += '</div>';\
+\
+        html += '</div>';\
+\
+        // Direction labels \'e2\'80\'94 bottom\
+        html += '<div class="lndd-dir-bottom">';\
+        html += '<span></span><span>S\'e1\'bb\'adu</span><span>T\uc0\u258 \'bd</span><span>H\'e1\'bb\'a3i</span><span></span>';\
+        html += '</div>';\
+\
+        html += '</div>';\
+        return html;\
+    \}\
+\
+    // ============================================================\
+    //  PALACE CELL (12 border cells)\
+    // ============================================================\
+\
+    // Color map for elements\
+    var ELEMENT_COLORS = \{\
+        0: '#2e7d32', // M\'e1\'bb\'99c \'e2\'80\'94 green\
+        1: '#c62828', // H\'e1\'bb\uc0\u143 a \'e2\'80\'94 red\
+        2: '#795548', // Th\'e1\'bb\'95 \'e2\'80\'94 brown\
+        3: '#ef6c00', // Kim \'e2\'80\'94 orange/gold\
+        4: '#1565c0'  // Th\'e1\'bb\'a7y \'e2\'80\'94 blue\
+    \};\
+\
+    function renderPalaceCell(r, diBanIdx) \{\
+        var pal = r.palaces[diBanIdx];\
+        var tbEl = LNDD_Engine.CHI_ELEMENT[pal.thienBan];\
+        var tbColor = ELEMENT_COLORS[tbEl] || '#333';\
+        var isKV = isKongWang(r, diBanIdx);\
+        var isTamTruyen = isTamTruyenPalace(r, diBanIdx);\
+        var kvClass = isKV ? ' lndd-cell-kv' : '';\
+        var ttClass = isTamTruyen ? ' lndd-cell-tt' : '';\
+\
+        var html = '<div class="lndd-palace' + kvClass + ttClass + '">';\
+\
+        // Top line: \'c4\uc0\u144 \'e1\'bb\'8ba B\u258 \'a0n label + Thi\u258 \'aan B\u258 \'a0n branch\
+        html += '<div class="lndd-p-header">';\
+        html += '<span class="lndd-p-diban">' + LNDD_Engine.getChiName(diBanIdx) + '</span>';\
+        html += '<span class="lndd-p-thienban" style="color:' + tbColor + '">' + pal.thienBanName + '</span>';\
+        html += '</div>';\
+\
+        // Thi\uc0\u258 \'aan T\'c6\'b0\'e1\'bb\'9bng\
+        html += '<div class="lndd-p-general">' + pal.generalName + '</div>';\
+\
+        // Nguy\'e1\'bb\'87t T\'c6\'b0\'e1\'bb\'9bng name (of Thi\uc0\u258 \'aan B\u258 \'a0n branch)\
+        html += '<div class="lndd-p-nt">' + LNDD_Engine.NGUYET_TUONG_NAMES[pal.thienBan] + '</div>';\
+\
+        // Lo\'e1\'ba\'a1i Th\'e1\'ba\'a7n (line 3 \'e2\'80\'94 matching PTTL)\
+        html += '<div class="lndd-p-lucthan">' + pal.loaiThanName + '</div>';\
+\
+        // Th\'e1\'ba\'a7n S\uc0\u258 \'a1t \'e2\'80\'94 V\u258 \'b2ng Th\u258 \'a1i Tu\'e1\'ba\'bf (line 4)\
+        if (pal.thanSat && pal.thanSat.length > 0) \{\
+            html += '<div class="lndd-p-thansat">' + pal.thanSat.join(', ') + '</div>';\
+        \}\
+\
+        // KV badge\
+        if (isKV) \{\
+            html += '<div class="lndd-p-kv-badge">Kh\uc0\u258 \'b4ng Vong</div>';\
+        \}\
+\
+        html += '</div>';\
+        return html;\
+    \}\
+\
+    function isKongWang(r, diBanIdx) \{\
+        var kv = r.kongWang.day;\
+        return kv[0] === diBanIdx || kv[1] === diBanIdx;\
+    \}\
+\
+    function isTamTruyenPalace(r, diBanIdx) \{\
+        for (var i = 0; i < 3; i++) \{\
+            if (r.tamTruyen[i].branch === diBanIdx) return true;\
+        \}\
+        return false;\
+    \}\
+\
+    // ============================================================\
+    //  CENTER CELLS (4 cells in middle \'e2\'80\'94 T\'e1\'bb\'a9 Kh\uc0\u258 \'b3a + Tam Truy\'e1\'bb\u129 n + info)\
+    // ============================================================\
+\
+    function renderCenterCell(r, cellId) \{\
+        var html = '<div class="lndd-center-cell lndd-center-' + cellId + '">';\
+\
+        if (cellId === 'c1') \{\
+            // Th\'e1\'bb\uc0\u157 i Kh\u258 \'b3a \'e2\'80\'94 Four Pillars mini\
+            html += '<div class="lndd-center-title">TH\'e1\'bb\'9cI KH\uc0\u258 \'93A</div>';\
+            html += '<table class="lndd-tk-table">';\
+            html += '<tr><th>N\'c4\'82M</th><th>TH\uc0\u258 \u129 NG</th><th>NG\u258 \'80Y</th><th>GI\'e1\'bb\'9c</th></tr>';\
+            var fp = r.fourPillars;\
+            html += '<tr><td>' + LNDD_Engine.formatCanChi(fp.year) + '</td>';\
+            html += '<td>' + LNDD_Engine.formatCanChi(fp.month) + '</td>';\
+            html += '<td>' + LNDD_Engine.formatCanChi(fp.day) + '</td>';\
+            html += '<td>' + LNDD_Engine.formatCanChi(fp.hour) + '</td></tr>';\
+            // Kh\uc0\u258 \'b4ng Vong row\
+            html += '<tr class="lndd-tk-kv"><td>' + LNDD_Engine.getChiName(r.kongWang.year[0]) + ' ' + LNDD_Engine.getChiName(r.kongWang.year[1]) + '</td>';\
+            html += '<td>' + LNDD_Engine.getChiName(r.kongWang.month[0]) + ' ' + LNDD_Engine.getChiName(r.kongWang.month[1]) + '</td>';\
+            html += '<td>' + LNDD_Engine.getChiName(r.kongWang.day[0]) + ' ' + LNDD_Engine.getChiName(r.kongWang.day[1]) + '</td>';\
+            html += '<td>' + LNDD_Engine.getChiName(r.kongWang.hour[0]) + ' ' + LNDD_Engine.getChiName(r.kongWang.hour[1]) + '</td></tr>';\
+            html += '</table>';\
+        \}\
+        else if (cellId === 'c2') \{\
+            // Nguy\'e1\'bb\'87t T\'c6\'b0\'e1\'bb\'9bng + Can Chi info\
+            html += '<div class="lndd-center-title">NGUY\'e1\'bb\'86T T\'c6\'af\'e1\'bb\uc0\u154 NG</div>';\
+            html += '<div class="lndd-nt-big">' + LNDD_Engine.getChiName(r.nguyetTuong.branch) + '</div>';\
+            html += '<div class="lndd-nt-name">' + r.nguyetTuong.name + '</div>';\
+            html += '<table class="lndd-can-chi-table">';\
+            html += '<tr><td class="lndd-label">CAN</td><td class="lndd-label">CHI</td></tr>';\
+            html += '<tr><td class="lndd-val">' + LNDD_Engine.getCanName(r.dayCan) + '</td>';\
+            html += '<td class="lndd-val">' + LNDD_Engine.getChiName(r.dayChi) + '</td></tr>';\
+            html += '</table>';\
+        \}\
+        else if (cellId === 'c3') \{\
+            // T\'e1\'bb\'a9 Kh\uc0\u258 \'b3a\
+            html += '<div class="lndd-center-title">T\'e1\'bb\'a8 KH\uc0\u258 \'93A</div>';\
+            html += '<table class="lndd-tukhoa-table">';\
+            html += '<tr><th>NH\'e1\'ba\'a4T</th><th>NH\'e1\'bb\uc0\u138 </th><th>TAM</th><th>T\'e1\'bb\'a8</th></tr>';\
+            // Thi\uc0\u258 \'aan T\'c6\'b0\'e1\'bb\'9bng row\
+            html += '<tr class="lndd-tt-row">';\
+            for (var i = 0; i < 4; i++) html += '<td class="lndd-general-name">' + r.tuKhoa[i].generalName + '</td>';\
+            html += '</tr>';\
+            // Top branch row\
+            html += '<tr>';\
+            for (var i = 0; i < 4; i++) html += '<td class="lndd-tk-top">' + LNDD_Engine.getChiName(r.tuKhoa[i].top) + '</td>';\
+            html += '</tr>';\
+            // Bottom branch row\
+            html += '<tr>';\
+            for (var i = 0; i < 4; i++) \{\
+                var botText = LNDD_Engine.getChiName(r.tuKhoa[i].bottom);\
+                if (i === 0) botText = LNDD_Engine.getCanName(r.dayCan);\
+                html += '<td class="lndd-tk-bot">' + botText + '</td>';\
+            \}\
+            html += '</tr>';\
+            html += '</table>';\
+        \}\
+        else if (cellId === 'c4') \{\
+            // Tam Truy\'e1\'bb\uc0\u129 n\
+            html += '<div class="lndd-center-title">TAM TRUY\'e1\'bb\'80N</div>';\
+            html += '<table class="lndd-tamtruyen-table">';\
+            html += '<tr><th></th><th>Chi</th><th>L\'e1\'bb\'a5c Th\uc0\u258 \'a2n</th><th>Thi\u258 \'aan T\'c6\'b0\'e1\'bb\'9bng</th></tr>';\
+            for (var i = 0; i < 3; i++) \{\
+                var tt = r.tamTruyen[i];\
+                html += '<tr>';\
+                html += '<td class="lndd-tt-label">' + tt.label + '</td>';\
+                html += '<td class="lndd-tt-branch">' + tt.branchName + '</td>';\
+                html += '<td class="lndd-tt-lt">' + tt.lucThanName + '</td>';\
+                html += '<td class="lndd-tt-gen">' + tt.generalName + '</td>';\
+                html += '</tr>';\
+            \}\
+            html += '</table>';\
+        \}\
+\
+        html += '</div>';\
+        return html;\
+    \}\
+\
+    // ============================================================\
+    //  CTA BANNER\
+    // ============================================================\
+    function renderPhoneBar() \{\
+        return '<div class="lndd-cta-banner">' +\
+            '<div class="lndd-cta-icon">\uc0\u273 \'9f\'94\'ae</div>' +\
+            '<div class="lndd-cta-content">' +\
+                '<div class="lndd-cta-title">Lu\'e1\'ba\'adn Gi\'e1\'ba\'a3i Chuy\uc0\u258 \'aan S\u258 \'a2u L\'e1\'bb\'a5c Nh\u258 \'a2m \'c4\u144 \'e1\'ba\'a1i \'c4\u144 \'e1\'bb\'99n</div>' +\
+                '<div class="lndd-cta-desc">\'c4\uc0\u144 \'e1\'bb\'83 \'c4\'91\'c6\'b0\'e1\'bb\'a3c chuy\u258 \'aan gia T\u258 \'a2m An ph\u258 \'a2n t\u258 \'adch & lu\'e1\'ba\'adn gi\'e1\'ba\'a3i chi ti\'e1\'ba\'bft b\u258 \'a0n qu\'e1\'ba\'bb c\'e1\'bb\'a7a b\'e1\'ba\'a1n</div>' +\
+            '</div>' +\
+            '<a href="https://zalo.me/0971231488" target="_blank" class="lndd-cta-btn">' +\
+                '<span class="lndd-cta-phone-icon">\uc0\u273 \'9f\'93\u158 </span> 0971231488' +\
+            '</a>' +\
+        '</div>';\
+    \}\
+\
+    // ============================================================\
+    //  RAW TEXT FOR AI\
+    // ============================================================\
+    function renderRawText(r) \{\
+        var text = LNDD_Engine.generateRawText(r);\
+        var html = '<div class="lndd-rawtext">';\
+        html += '<h3>\uc0\u273 \'9f\'93\'8b D\'e1\'bb\'af li\'e1\'bb\'87u \'c4\'91\'e1\'bb\'83 h\'e1\'bb\u143 i AI lu\'e1\'ba\'adn gi\'e1\'ba\'a3i</h3>';\
+        html += '<p class="lndd-rawtext-desc">Sao ch\uc0\u258 \'a9p n\'e1\'bb\'99i dung d\'c6\'b0\'e1\'bb\'9bi \'c4\'91\u258 \'a2y v\u258 \'a0 d\u258 \'a1n v\u258 \'a0o AI (ChatGPT, Gemini, ...) \'c4\'91\'e1\'bb\'83 nh\'e1\'ba\'adn lu\'e1\'ba\'adn gi\'e1\'ba\'a3i chi ti\'e1\'ba\'bft.</p>';\
+        html += '<div class="lndd-rawtext-box" id="lndd-rawtext-content">' + text.replace(/\\n/g, '<br>').replace(/\\*\\*([^*]+)\\*\\*/g, '<strong>$1</strong>') + '</div>';\
+        html += '<button class="lndd-btn-copy" onclick="lnddCopyRawText()">\uc0\u273 \'9f\'93\'8b Sao Ch\u258 \'a9p</button>';\
+        html += '</div>';\
+        return html;\
+    \}\
+\
+    window.lnddCopyRawText = function() \{\
+        var el = document.getElementById('lndd-rawtext-content');\
+        var text = el.innerText || el.textContent;\
+        if (navigator.clipboard) \{\
+            navigator.clipboard.writeText(text).then(function() \{\
+                var btn = document.querySelector('.lndd-btn-copy');\
+                btn.textContent = '\'e2\'9c\'85 \'c4\uc0\u144 \u258 \'a3 sao ch\u258 \'a9p!';\
+                setTimeout(function() \{ btn.textContent = '\uc0\u273 \'9f\'93\'8b Sao Ch\u258 \'a9p'; \}, 2000);\
+            \});\
+        \} else \{\
+            var range = document.createRange();\
+            range.selectNode(el);\
+            window.getSelection().removeAllRanges();\
+            window.getSelection().addRange(range);\
+            document.execCommand('copy');\
+            window.getSelection().removeAllRanges();\
+        \}\
+    \};\
+\
+    // Auto-fill current time on load\
+    document.addEventListener('DOMContentLoaded', function() \{\
+        lnddSetNow();\
+    \});\
+\
+\})();\
+\pard\pardeftab560\slleading20\pardirnatural\partightenfactor0
+
+\f1\fs26 \cf0 \
+\pard\pardeftab560\slleading20\partightenfactor0
+
+\f0\fs24 \cf0 /**\
+ * L\'e1\'bb\'a5c Nh\uc0\u258 \'a2m \'c4\u144 \'e1\'ba\'a1i \'c4\u144 \'e1\'bb\'99n (\'e5\'a4\'a7\'e5\'85\'ad\'e5\'a3\'ac) \'e2\'80\'94 Core Engine\
+ * Ph\'c6\'b0\'c6\'a1ng ph\uc0\u258 \'a1p: Chuy\'e1\'bb\'83n B\u258 \'a0n chu\'e1\'ba\'a9n\
+ * Cho H\'e1\'bb\uc0\u141 c Vi\'e1\'bb\'87n T\u258 \'a2m An \'e2\'80\'94 phongthuy.battutaman.vn\
+ */\
+var LNDD_Engine = (function()\{\
+    'use strict';\
+\
+    // ============================================================\
+    //  CONSTANTS\
+    // ============================================================\
+    var THIEN_CAN = ['Gi\uc0\u258 \'a1p','\'e1\'ba\'a4t','B\u258 \'adnh','\'c4\u144 inh','M\'e1\'ba\'adu','K\'e1\'bb\'b7','Canh','T\u258 \'a2n','Nh\u258 \'a2m','Qu\u258 \'bd'];\
+    var DIA_CHI   = ['T\uc0\u258 \'bd','S\'e1\'bb\'adu','D\'e1\'ba\'a7n','M\u258 \'a3o','Th\u258 \'acn','T\'e1\'bb\'b5','Ng\'e1\'bb\u141 ','M\u258 \'b9i','Th\u258 \'a2n','D\'e1\'ba\'adu','Tu\'e1\'ba\'a5t','H\'e1\'bb\'a3i'];\
+    var NGU_HANH  = ['M\'e1\'bb\'99c','H\'e1\'bb\uc0\u143 a','Th\'e1\'bb\'95','Kim','Th\'e1\'bb\'a7y'];\
+\
+    // Element of each Stem: Gi\uc0\u258 \'a1p/\'e1\'ba\'a4t=M\'e1\'bb\'99c(0), B\u258 \'adnh/\'c4\u144 inh=H\'e1\'bb\u143 a(1), etc.\
+    var CAN_ELEMENT = [0,0,1,1,2,2,3,3,4,4];\
+    // Element of each Branch\
+    var CHI_ELEMENT = [4,2,0,0,2,1,1,2,3,3,2,4];\
+    // T\uc0\u258 \'bd=Th\'e1\'bb\'a7y, S\'e1\'bb\'adu=Th\'e1\'bb\'95, D\'e1\'ba\'a7n=M\'e1\'bb\'99c, M\u258 \'a3o=M\'e1\'bb\'99c, Th\u258 \'acn=Th\'e1\'bb\'95, T\'e1\'bb\'b5=H\'e1\'bb\u143 a,\
+    // Ng\'e1\'bb\uc0\u141 =H\'e1\'bb\u143 a, M\u258 \'b9i=Th\'e1\'bb\'95, Th\u258 \'a2n=Kim, D\'e1\'ba\'adu=Kim, Tu\'e1\'ba\'a5t=Th\'e1\'bb\'95, H\'e1\'bb\'a3i=Th\'e1\'bb\'a7y\
+\
+    // Stem lodging branch (\'e5\'b9\'b2\'e5\'af\'84\'e5\'ae\'ae)\
+    // Gi\uc0\u258 \'a1p\'e2\'86\'92D\'e1\'ba\'a7n, \'e1\'ba\'a4t\'e2\'86\'92Th\u258 \'acn, B\u258 \'adnh\'e2\'86\'92T\'e1\'bb\'b5, \'c4\u144 inh\'e2\'86\'92M\u258 \'b9i, M\'e1\'ba\'adu\'e2\'86\'92T\'e1\'bb\'b5, K\'e1\'bb\'b7\'e2\'86\'92M\u258 \'b9i,\
+    // Canh\'e2\'86\'92Th\uc0\u258 \'a2n, T\u258 \'a2n\'e2\'86\'92Tu\'e1\'ba\'a5t, Nh\u258 \'a2m\'e2\'86\'92H\'e1\'bb\'a3i, Qu\u258 \'bd\'e2\'86\'92S\'e1\'bb\'adu\
+    var CAN_KY_CUNG = [2, 4, 5, 7, 5, 7, 8, 10, 11, 1];\
+\
+    // Qu\uc0\u258 \'bd Nh\u258 \'a2n positions: QUY_NHAN[dayCan] = [dayBranch, nightBranch]\
+    // \'e7\'94\'b2\'e6\'88\uc0\u138 \'e5\'ba\u154 \'e2\'86\'92\'e4\'b8\'91\'e6\'9c\'aa, \'e4\'b9\'99\'e5\'b7\'b1\'e2\'86\'92\'e5\'ad\u144 \'e7\'94\'b3, \'e4\'b8\'99\'e4\'b8\u129 \'e2\'86\'92\'e4\'ba\'a5\'e9\'85\'89, \'e5\'a3\'ac\'e7\'99\'b8\'e2\'86\'92\'e5\'b7\'b3\'e5\u141 \'af, \'e8\'be\'9b\'e2\'86\'92\'e5\u141 \'88\'e5\'af\'85\
+    var QUY_NHAN = [\
+        [1, 7],   // Gi\uc0\u258 \'a1p(0)  \'e2\'86\'92 S\'e1\'bb\'adu/M\u258 \'b9i\
+        [0, 8],   // \'e1\'ba\'a4t(1)   \'e2\'86\'92 T\uc0\u258 \'bd/Th\u258 \'a2n\
+        [11, 9],  // B\uc0\u258 \'adnh(2) \'e2\'86\'92 H\'e1\'bb\'a3i/D\'e1\'ba\'adu\
+        [11, 9],  // \'c4\uc0\u144 inh(3) \'e2\'86\'92 H\'e1\'bb\'a3i/D\'e1\'ba\'adu\
+        [1, 7],   // M\'e1\'ba\'adu(4)  \'e2\'86\'92 S\'e1\'bb\'adu/M\uc0\u258 \'b9i\
+        [0, 8],   // K\'e1\'bb\'b7(5)   \'e2\'86\'92 T\uc0\u258 \'bd/Th\u258 \'a2n\
+        [1, 7],   // Canh(6) \'e2\'86\'92 S\'e1\'bb\'adu/M\uc0\u258 \'b9i\
+        [6, 2],   // T\uc0\u258 \'a2n(7)  \'e2\'86\'92 Ng\'e1\'bb\u141 /D\'e1\'ba\'a7n\
+        [5, 3],   // Nh\uc0\u258 \'a2m(8) \'e2\'86\'92 T\'e1\'bb\'b5/M\u258 \'a3o\
+        [5, 3]    // Qu\uc0\u258 \'bd(9)  \'e2\'86\'92 T\'e1\'bb\'b5/M\u258 \'a3o\
+    ];\
+\
+    // 12 Thi\uc0\u258 \'aan T\'c6\'b0\'e1\'bb\'9bng (Celestial Generals) \'e2\'80\'94 in sequence from Qu\u258 \'bd Nh\u258 \'a2n\
+    var THIEN_TUONG = [\
+        \{name:'Qu\uc0\u258 \'bd Nh\u258 \'a2n',   short:'Qu\u258 \'bd',  element:2\}, // Th\'e1\'bb\'95\
+        \{name:'\'c4\uc0\u144 \'e1\'ba\'b1ng X\u258 \'a0',    short:'X\u258 \'a0',   element:1\}, // H\'e1\'bb\u143 a\
+        \{name:'Chu T\'c6\'b0\'e1\'bb\'9bc',    short:'T\'c6\'b0\'e1\'bb\'9bc', element:1\}, // H\'e1\'bb\uc0\u143 a\
+        \{name:'L\'e1\'bb\'a5c H\'e1\'bb\'a3p',    short:'H\'e1\'bb\'a3p',  element:0\}, // M\'e1\'bb\'99c\
+        \{name:'C\uc0\u258 \'a2u Tr\'e1\'ba\'a7n',   short:'Tr\'e1\'ba\'a7n', element:2\}, // Th\'e1\'bb\'95\
+        \{name:'Thanh Long',  short:'Long', element:0\}, // M\'e1\'bb\'99c\
+        \{name:'Thi\uc0\u258 \'aan Kh\u258 \'b4ng', short:'Kh\u258 \'b4ng',element:2\}, // Th\'e1\'bb\'95\
+        \{name:'B\'e1\'ba\'a1ch H\'e1\'bb\'95',    short:'H\'e1\'bb\'95',   element:3\}, // Kim\
+        \{name:'Th\uc0\u258 \'a1i Th\'c6\'b0\'e1\'bb\u157 ng', short:'Th\'c6\'b0\'e1\'bb\u157 ng',element:2\},// Th\'e1\'bb\'95\
+        \{name:'Huy\'e1\'bb\uc0\u129 n V\'c5\'a9',   short:'V\'c5\'a9',   element:4\}, // Th\'e1\'bb\'a7y\
+        \{name:'Th\uc0\u258 \'a1i \u258 \'82m',    short:'\u258 \'82m',   element:3\}, // Kim\
+        \{name:'Thi\uc0\u258 \'aan H\'e1\'ba\'adu',  short:'H\'e1\'ba\'adu',  element:4\}  // Th\'e1\'bb\'a7y\
+    ];\
+\
+    // 12 Nguy\'e1\'bb\'87t T\'c6\'b0\'e1\'bb\'9bng names (indexed by branch value)\
+    var NGUYET_TUONG_NAMES = [\
+        'Th\'e1\'ba\'a7n H\'e1\'ba\'adu',    // T\uc0\u258 \'bd(0)\
+        '\'c4\uc0\u144 \'e1\'ba\'a1i C\u258 \'a1t',     // S\'e1\'bb\'adu(1)\
+        'C\uc0\u258 \'b4ng T\u258 \'a0o',    // D\'e1\'ba\'a7n(2)\
+        'Th\uc0\u258 \'a1i Xung',   // M\u258 \'a3o(3)\
+        'Thi\uc0\u258 \'aan C\'c6\'b0\'c6\'a1ng',  // Th\u258 \'acn(4)\
+        'Th\uc0\u258 \'a1i \'e1\'ba\'a4t',     // T\'e1\'bb\'b5(5)\
+        'Th\'e1\'ba\'afng Quang', // Ng\'e1\'bb\uc0\u141 (6)\
+        'Ti\'e1\'bb\'83u C\uc0\u258 \'a1t',    // M\u258 \'b9i(7)\
+        'Truy\'e1\'bb\uc0\u129 n T\'e1\'bb\'91ng', // Th\u258 \'a2n(8)\
+        'T\uc0\u258 \'b2ng Kh\u258 \'b4i',   // D\'e1\'ba\'adu(9)\
+        'H\uc0\u258 \'a0 Kh\u258 \'b4i',     // Tu\'e1\'ba\'a5t(10)\
+        '\'c4\uc0\u144 \'c4\'83ng Minh'    // H\'e1\'bb\'a3i(11)\
+    ];\
+\
+    // Nguy\'e1\'bb\'87t T\'c6\'b0\'e1\'bb\'9bng \'e2\'86\'92 determined by most recent Trung Kh\uc0\u258 \'ad (\'e4\'b8\'ad\'e6\'b0\'a3)\
+    var TRUNG_KHI_TO_NT = \{\
+        '\'c4\uc0\u144 \'e1\'ba\'a1i H\u258 \'a0n':    0,  // T\u258 \'bd  - Th\'e1\'ba\'a7n H\'e1\'ba\'adu\
+        'V\'c5\'a9 Th\'e1\'bb\'a7y':    11, // H\'e1\'bb\'a3i - \'c4\uc0\u144 \'c4\'83ng Minh\
+        'Xu\uc0\u258 \'a2n Ph\u258 \'a2n':  10, // Tu\'e1\'ba\'a5t - H\u258 \'a0 Kh\u258 \'b4i\
+        'C\'e1\'bb\'91c V\'c5\'a9':     9, // D\'e1\'ba\'adu - T\uc0\u258 \'b2ng Kh\u258 \'b4i\
+        'Ti\'e1\'bb\'83u M\uc0\u258 \'a3n':   8, // Th\u258 \'a2n - Truy\'e1\'bb\u129 n T\'e1\'bb\'91ng\
+        'H\'e1\'ba\'a1 Ch\uc0\u258 \'ad':     7, // M\u258 \'b9i - Ti\'e1\'bb\'83u C\u258 \'a1t\
+        '\'c4\uc0\u144 \'e1\'ba\'a1i Th\'e1\'bb\'ad':    6, // Ng\'e1\'bb\u141  - Th\'e1\'ba\'afng Quang\
+        'X\'e1\'bb\'ad Th\'e1\'bb\'ad':     5, // T\'e1\'bb\'b5  - Th\uc0\u258 \'a1i \'e1\'ba\'a4t\
+        'Thu Ph\uc0\u258 \'a2n':    4, // Th\u258 \'acn - Thi\u258 \'aan C\'c6\'b0\'c6\'a1ng\
+        'S\'c6\'b0\'c6\'a1ng Gi\uc0\u258 \'a1ng': 3, // M\u258 \'a3o - Th\u258 \'a1i Xung\
+        'Ti\'e1\'bb\'83u Tuy\'e1\'ba\'bft': 2, // D\'e1\'ba\'a7n - C\uc0\u258 \'b4ng T\u258 \'a0o\
+        '\'c4\uc0\u144 \u258 \'b4ng Ch\u258 \'ad':   1  // S\'e1\'bb\'adu - \'c4\u144 \'e1\'ba\'a1i C\u258 \'a1t\
+    \};\
+\
+    // 12 Tr\'c6\'b0\'e1\'bb\uc0\u157 ng Sinh stages\
+    var TRUONG_SINH_NAMES = [\
+        'Tr\'c6\'b0\'e1\'bb\uc0\u157 ng Sinh','M\'e1\'bb\'99c D\'e1\'bb\'a5c','Quan \'c4\u144 \'e1\'bb\'9bi','L\u258 \'a2m Quan',\
+        '\'c4\uc0\u144 \'e1\'ba\'bf V\'c6\'b0\'e1\'bb\'a3ng','Suy','B\'e1\'bb\'87nh','T\'e1\'bb\'ad','M\'e1\'bb\'99','Tuy\'e1\'bb\'87t','Thai','D\'c6\'b0\'e1\'bb\'a1ng'\
+    ];\
+\
+    // Tr\'c6\'b0\'e1\'bb\uc0\u157 ng Sinh starting branch for each Stem\
+    var TRUONG_SINH_START = [11, 6, 2, 9, 2, 9, 5, 0, 8, 3];\
+\
+    // L\'e1\'bb\'a5c Th\uc0\u258 \'a2n names\
+    var LUC_THAN_NAMES = ['Huynh \'c4\uc0\u144 \'e1\'bb\'87','T\'e1\'bb\'ad T\u258 \'b4n','Th\u258 \'aa T\u258 \'a0i','Quan Qu\'e1\'bb\'b7','Ph\'e1\'bb\'a5 M\'e1\'ba\'abu'];\
+\
+    // Kh\uc0\u258 \'b4ng Vong lookup\
+    var KONG_WANG = \{\
+        0:[10,11], 10:[8,9], 20:[6,7], 30:[4,5], 40:[2,3], 50:[0,1]\
+    \};\
+\
+    // ============================================================\
+    //  CAN CHI CALCULATIONS\
+    // ============================================================\
+\
+    function getJDN(year, month, day) \{\
+        var a = Math.floor((14 - month) / 12);\
+        var y = year + 4800 - a;\
+        var m = month + 12 * a - 3;\
+        return day + Math.floor((153 * m + 2) / 5) + 365 * y +\
+               Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;\
+    \}\
+\
+    function getJiaZiIndex(canIdx, chiIdx) \{\
+        for (var n = 0; n < 60; n++) \{\
+            if (n % 10 === canIdx && n % 12 === chiIdx) return n;\
+        \}\
+        return 0;\
+    \}\
+\
+    function getDayCanChi(year, month, day) \{\
+        var jdn = getJDN(year, month, day);\
+        var canIdx = (jdn + 9) % 10;\
+        var chiIdx = (jdn + 1) % 12;\
+        return \{ can: canIdx, chi: chiIdx, jiaZi: getJiaZiIndex(canIdx, chiIdx) \};\
+    \}\
+\
+    function getHourChi(hour) \{\
+        return Math.floor(((hour + 1) % 24) / 2);\
+    \}\
+\
+    function getHourCan(dayCan, hourChi) \{\
+        var startCan = [0, 2, 4, 6, 8, 0, 2, 4, 6, 8];\
+        return (startCan[dayCan] + hourChi) % 10;\
+    \}\
+\
+    function getYearCanChi(year, month, day, hour, minute) \{\
+        hour = hour || 0; minute = minute || 0;\
+        var terms = KMDG_Solar.getAllTerms(year);\
+        var jd = KMDG_Solar.dateToJD(year, month, day, hour, minute);\
+        var lapXuan = null;\
+        for (var i = 0; i < terms.length; i++) \{\
+            if (terms[i].name === 'L\'e1\'ba\'adp Xu\uc0\u258 \'a2n') \{ lapXuan = terms[i]; break; \}\
+        \}\
+        var effectiveYear = year;\
+        if (lapXuan && jd < lapXuan.jd) effectiveYear = year - 1;\
+        var canIdx = (effectiveYear - 4) % 10;\
+        if (canIdx < 0) canIdx += 10;\
+        var chiIdx = (effectiveYear - 4) % 12;\
+        if (chiIdx < 0) chiIdx += 12;\
+        return \{ can: canIdx, chi: chiIdx, jiaZi: getJiaZiIndex(canIdx, chiIdx) \};\
+    \}\
+\
+    function getMonthCanChi(yearCan, solarTermName) \{\
+        var termToMonth = \{\
+            'L\'e1\'ba\'adp Xu\uc0\u258 \'a2n':0,'V\'c5\'a9 Th\'e1\'bb\'a7y':0,'Kinh Ch\'e1\'ba\'adp':1,'Xu\u258 \'a2n Ph\u258 \'a2n':1,\
+            'Thanh Minh':2,'C\'e1\'bb\'91c V\'c5\'a9':2,'L\'e1\'ba\'adp H\'e1\'ba\'a1':3,'Ti\'e1\'bb\'83u M\uc0\u258 \'a3n':3,\
+            'Mang Ch\'e1\'bb\'a7ng':4,'H\'e1\'ba\'a1 Ch\uc0\u258 \'ad':4,'Ti\'e1\'bb\'83u Th\'e1\'bb\'ad':5,'\'c4\u144 \'e1\'ba\'a1i Th\'e1\'bb\'ad':5,\
+            'L\'e1\'ba\'adp Thu':6,'X\'e1\'bb\'ad Th\'e1\'bb\'ad':6,'B\'e1\'ba\'a1ch L\'e1\'bb\'99':7,'Thu Ph\uc0\u258 \'a2n':7,\
+            'H\uc0\u258 \'a0n L\'e1\'bb\'99':8,'S\'c6\'b0\'c6\'a1ng Gi\u258 \'a1ng':8,'L\'e1\'ba\'adp \'c4\u144 \u258 \'b4ng':9,'Ti\'e1\'bb\'83u Tuy\'e1\'ba\'bft':9,\
+            '\'c4\uc0\u144 \'e1\'ba\'a1i Tuy\'e1\'ba\'bft':10,'\'c4\u144 \u258 \'b4ng Ch\u258 \'ad':10,'Ti\'e1\'bb\'83u H\u258 \'a0n':11,'\'c4\u144 \'e1\'ba\'a1i H\u258 \'a0n':11\
+        \};\
+        var monthNum = termToMonth[solarTermName] || 0;\
+        var chiIdx = (monthNum + 2) % 12;\
+        var startCan = [2, 4, 6, 8, 0, 2, 4, 6, 8, 0];\
+        var canIdx = (startCan[yearCan] + monthNum) % 10;\
+        return \{ can: canIdx, chi: chiIdx, jiaZi: getJiaZiIndex(canIdx, chiIdx) \};\
+    \}\
+\
+    function getTuanHead(jiaZiIdx) \{ return Math.floor(jiaZiIdx / 10) * 10; \}\
+\
+    function getKongWang(jiaZiIdx) \{\
+        var tuanHead = getTuanHead(jiaZiIdx);\
+        return KONG_WANG[tuanHead];\
+    \}\
+\
+    // ============================================================\
+    //  NGUY\'e1\'bb\'86T T\'c6\'af\'e1\'bb\uc0\u154 NG (Monthly General)\
+    // ============================================================\
+\
+    /** Find the most recent Trung Kh\uc0\u258 \'ad and return the Nguy\'e1\'bb\'87t T\'c6\'b0\'e1\'bb\'9bng branch */\
+    function getNguyetTuong(year, month, day, hour, minute) \{\
+        var jd = KMDG_Solar.dateToJD(year, month, day, hour || 0, minute || 0);\
+\
+        // Collect all solar terms for adjacent years\
+        var allTerms = [];\
+        for (var yr = year - 1; yr <= year + 1; yr++) \{\
+            allTerms = allTerms.concat(KMDG_Solar.getAllTerms(yr));\
+        \}\
+        allTerms.sort(function(a, b) \{ return a.jd - b.jd; \});\
+\
+        // Trung Kh\uc0\u258 \'ad names set\
+        var trungKhiSet = \{\};\
+        for (var k in TRUNG_KHI_TO_NT) trungKhiSet[k] = true;\
+\
+        // Find the most recent Trung Kh\uc0\u258 \'ad before current JD\
+        var lastTrungKhi = null;\
+        for (var i = 0; i < allTerms.length; i++) \{\
+            if (allTerms[i].jd <= jd && trungKhiSet[allTerms[i].name]) \{\
+                lastTrungKhi = allTerms[i];\
+            \}\
+        \}\
+\
+        if (!lastTrungKhi) \{\
+            // Fallback: use \'c4\uc0\u144 \u258 \'b4ng Ch\u258 \'ad\
+            return \{ branch: 1, name: NGUYET_TUONG_NAMES[1], termName: '\'c4\uc0\u144 \u258 \'b4ng Ch\u258 \'ad' \};\
+        \}\
+\
+        var ntBranch = TRUNG_KHI_TO_NT[lastTrungKhi.name];\
+        return \{\
+            branch: ntBranch,\
+            name: NGUYET_TUONG_NAMES[ntBranch],\
+            termName: lastTrungKhi.name\
+        \};\
+    \}\
+\
+    // ============================================================\
+    //  THI\uc0\u258 \u138 N \'c4\u144 \'e1\'bb\u138 A B\u258 \'80N\
+    // ============================================================\
+\
+    /** Build Thi\uc0\u258 \'aan B\u258 \'a0n: Nguy\'e1\'bb\'87t T\'c6\'b0\'e1\'bb\'9bng placed at Hour Branch */\
+    function buildThienBan(nguyetTuongBranch, hourChi) \{\
+        var tb = [];\
+        for (var p = 0; p < 12; p++) \{\
+            tb[p] = (nguyetTuongBranch + p - hourChi + 120) % 12;\
+        \}\
+        return tb; // tb[diBanPos] = thienBan branch at that position\
+    \}\
+\
+    // ============================================================\
+    //  QU\uc0\u258 \u157  NH\u258 \'82N & 12 THI\u258 \u138 N T\'c6\'af\'e1\'bb\u154 NG\
+    // ============================================================\
+\
+    function isDaytime(hourChi) \{\
+        // M\uc0\u258 \'a3o(3) to Th\u258 \'a2n(8) inclusive = daytime\
+        return hourChi >= 3 && hourChi <= 8;\
+    \}\
+\
+    function getQuyNhanBranch(dayCan, hourChi) \{\
+        var qn = QUY_NHAN[dayCan];\
+        return isDaytime(hourChi) ? qn[0] : qn[1];\
+    \}\
+\
+    /**\
+     * Place 12 Thi\uc0\u258 \'aan T\'c6\'b0\'e1\'bb\'9bng starting from Qu\u258 \'bd Nh\u258 \'a2n's branch.\
+     * Rule: \'e8\'b4\'b5\'e4\'ba\'ba\'e5\'b1\'85\'e9\'98\'b3\'e5\'88\'99\'e9\'80\'86, \'e5\'b1\'85\'e9\'98\'b4\'e5\'88\'99\'e9\'a1\'ba\
+     *   - QN branch is D\'c6\'b0\'c6\'a1ng (even: 0,2,4,6,8,10) \'e2\'86\'92 backward (\'e9\'80\'86\'e8\'a1\'8c)\
+     *   - QN branch is \uc0\u258 \'82m   (odd: 1,3,5,7,9,11) \'e2\'86\'92 forward  (\'e9\'a0\'86\'e8\'a1\'8c)\
+     * Returns: tuong[branch] = general index (0-11)\
+     */\
+    function buildThienTuong(quyNhanBranch, thienBan) \{\
+        var tuong = [];\
+        var diBanPos = 0;\
+        for (var i = 0; i < 12; i++) \{\
+            if (thienBan[i] === quyNhanBranch) \{\
+                diBanPos = i; break;\
+            \}\
+        \}\
+        // Qu\uc0\u258 \'bd Nh\u258 \'a2n c\'c6\'b0 H\'e1\'bb\'a3i, T\u258 \'bd, S\'e1\'bb\'adu, D\'e1\'ba\'a7n, M\u258 \'a3o, Th\u258 \'acn (11, 0, 1, 2, 3, 4) -> Thu\'e1\'ba\'adn\
+        var isForward = (diBanPos === 11 || (diBanPos >= 0 && diBanPos <= 4));\
+        for (var i = 0; i < 12; i++) \{\
+            var pos;\
+            if (!isForward) \{\
+                // Backward (\'e9\'80\'86): QN at branch, next at branch-1, etc.\
+                pos = ((quyNhanBranch - i) % 12 + 12) % 12;\
+            \} else \{\
+                // Forward (\'e9\'a0\'86): QN at branch, next at branch+1, etc.\
+                pos = (quyNhanBranch + i) % 12;\
+            \}\
+            tuong[pos] = i; // index into THIEN_TUONG array\
+        \}\
+        return tuong; // tuong[branch] = generalIndex\
+    \}\
+\
+    // ============================================================\
+    //  L\'e1\'bb\'a4C TH\uc0\u258 \'82N (Six Relations)\
+    // ============================================================\
+\
+    // Ng\'c5\'a9 H\uc0\u258 \'a0nh t\'c6\'b0\'c6\'a1ng sinh: M\'e1\'bb\'99c(0)\'e2\'86\'92H\'e1\'bb\u143 a(1)\'e2\'86\'92Th\'e1\'bb\'95(2)\'e2\'86\'92Kim(3)\'e2\'86\'92Th\'e1\'bb\'a7y(4)\'e2\'86\'92M\'e1\'bb\'99c(0)\
+    // generates(a) = (a+1)%5,  overcomes(a) = (a+2)%5\
+    function getLucThan(dayStemElement, branchElement) \{\
+        if (dayStemElement === branchElement) return 0; // Huynh \'c4\uc0\u144 \'e1\'bb\'87 (same element)\
+        if ((dayStemElement + 1) % 5 === branchElement) return 1; // T\'e1\'bb\'ad T\uc0\u258 \'b4n (I generate it)\
+        if ((dayStemElement + 2) % 5 === branchElement) return 2; // Th\uc0\u258 \'aa T\u258 \'a0i (I overcome it)\
+        if ((branchElement + 2) % 5 === dayStemElement) return 3; // Quan Qu\'e1\'bb\'b7 (it overcomes me)\
+        if ((branchElement + 1) % 5 === dayStemElement) return 4; // Ph\'e1\'bb\'a5 M\'e1\'ba\'abu (it generates me)\
+        return 0; // fallback\
+    \}\
+\
+    // ============================================================\
+    //  TR\'c6\'af\'e1\'bb\'9cNG SINH (12 Life Stages)\
+    // ============================================================\
+\
+    function getTruongSinh(dayCan, branch) \{\
+        var start = TRUONG_SINH_START[dayCan];\
+        var isYang = (dayCan % 2 === 0);\
+        var offset;\
+        if (isYang) \{\
+            offset = (branch - start + 12) % 12;\
+        \} else \{\
+            offset = (start - branch + 12) % 12;\
+        \}\
+        return offset; // index into TRUONG_SINH_NAMES\
+    \}\
+\
+    // ============================================================\
+    //  T\'e1\'bb\'a8 KH\uc0\u258 \'93A (Four Courses)\
+    // ============================================================\
+\
+    function buildTuKhoa(dayCan, dayChi, thienBan) \{\
+        var canLodge = CAN_KY_CUNG[dayCan];\
+\
+        // 1st Course: Bottom = canLodge, Top = thienBan[canLodge]\
+        var k1_bot = canLodge;\
+        var k1_top = thienBan[canLodge];\
+\
+        // 2nd Course: Bottom = k1_top, Top = thienBan[k1_top]\
+        var k2_bot = k1_top;\
+        var k2_top = thienBan[k1_top];\
+\
+        // 3rd Course: Bottom = dayChi, Top = thienBan[dayChi]\
+        var k3_bot = dayChi;\
+        var k3_top = thienBan[dayChi];\
+\
+        // 4th Course: Bottom = k3_top, Top = thienBan[k3_top]\
+        var k4_bot = k3_top;\
+        var k4_top = thienBan[k3_top];\
+\
+        return [\
+            \{ top: k1_top, bottom: k1_bot, label: 'Nh\'e1\'ba\'a5t' \},\
+            \{ top: k2_top, bottom: k2_bot, label: 'Nh\'e1\'bb\'8b' \},\
+            \{ top: k3_top, bottom: k3_bot, label: 'Tam' \},\
+            \{ top: k4_top, bottom: k4_bot, label: 'T\'e1\'bb\'a9' \}\
+        ];\
+    \}\
+\
+    // ============================================================\
+    //  TAM TRUY\'e1\'bb\'80N (Three Transmissions)\
+    // ============================================================\
+\
+    function doesOvercome(elA, elB) \{\
+        return (elA + 2) % 5 === elB;\
+    \}\
+\
+    function buildTamTruyen(tuKhoa, dayCan, thienBan) \{\
+        var dayStemEl = CAN_ELEMENT[dayCan];\
+        var dayChi = tuKhoa[2].bottom;\
+        var canLodge = tuKhoa[0].bottom;\
+        var isDayYang = (dayCan % 2 === 0);\
+\
+        function getUniqueCandidates(arr) \{\
+            var res = [];\
+            var seen = \{\};\
+            for (var k = 0; k < arr.length; k++) \{\
+                if (!seen[arr[k].branch]) \{\
+                    seen[arr[k].branch] = true;\
+                    res.push(arr[k]);\
+                \}\
+            \}\
+            return res;\
+        \}\
+\
+        var uniqueCourses = \{\};\
+        for (var i = 0; i < 4; i++) \{\
+            uniqueCourses[tuKhoa[i].top + '-' + tuKhoa[i].bottom] = true;\
+        \}\
+        var courseCount = Object.keys(uniqueCourses).length;\
+\
+        var soTruyen, trungTruyen, matTruyen;\
+\
+        // 1. Ph\'e1\'bb\'a5c Ng\uc0\u258 \'a2m (\'e4\'bc\u143 \'e5\u144 \'9f\'e8\'af\'be)\
+        if (thienBan[0] === 0) \{\
+            var k1TopEl = CHI_ELEMENT[canLodge];\
+            if (doesOvercome(k1TopEl, dayStemEl) || doesOvercome(dayStemEl, k1TopEl)) \{\
+                soTruyen = canLodge;\
+            \} else \{\
+                soTruyen = isDayYang ? canLodge : dayChi;\
+            \}\
+            var getHinh = function(b) \{\
+                var h = [3, 10, 5, 0, 4, 8, 6, 1, 2, 9, 7, 11];\
+                return h[b];\
+            \};\
+            trungTruyen = getHinh(soTruyen);\
+            if (trungTruyen === soTruyen) \{\
+                matTruyen = (trungTruyen + 6) % 12;\
+            \} else \{\
+                matTruyen = getHinh(trungTruyen);\
+                if (matTruyen === trungTruyen || matTruyen === soTruyen) \{\
+                    matTruyen = (trungTruyen + 6) % 12;\
+                \}\
+            \}\
+            return \{ so: soTruyen, trung: trungTruyen, mat: matTruyen \};\
+        \}\
+\
+        // 2. Ph\'e1\'ba\'a3n Ng\uc0\u258 \'a2m (\'e8\'bf\'94\'e5\u144 \'9f\'e8\'af\'be)\
+        if (thienBan[0] === 6) \{\
+            var hasOvercome = false;\
+            for (var i = 0; i < 4; i++) \{\
+                var topEl = CHI_ELEMENT[tuKhoa[i].top];\
+                var botEl = (i === 0) ? dayStemEl : CHI_ELEMENT[tuKhoa[i].bottom];\
+                if (doesOvercome(topEl, botEl) || doesOvercome(botEl, topEl)) hasOvercome = true;\
+            \}\
+            if (!hasOvercome) \{\
+                var tamHopKey = [2, 1, 0, 3, 2, 1, 0, 3, 2, 1, 0, 3];\
+                var maPositions = [8, 11, 2, 5];\
+                soTruyen = maPositions[tamHopKey[dayChi]];\
+                trungTruyen = dayChi;\
+                matTruyen = canLodge;\
+                return \{ so: soTruyen, trung: trungTruyen, mat: matTruyen \};\
+            \}\
+            // N\'e1\'ba\'bfu c\uc0\u258 \'b3 kh\'e1\'ba\'afc, s\'e1\'ba\'bd l\'e1\'bb\u141 t xu\'e1\'bb\'91ng x\'e1\'bb\'ad l\u258 \'bd T\'e1\'ba\'b7c Kh\'e1\'ba\'afc/T\'e1\'bb\'b7 D\'e1\'bb\'a5ng b\u258 \'aan d\'c6\'b0\'e1\'bb\'9bi\
+        \}\
+\
+        // 3. B\uc0\u258 \'a1t Chuy\u258 \'aan (\'e5\'85\'ab\'e4\'b8\'93\'e8\'af\'be)\
+        if (canLodge === dayChi && courseCount <= 2) \{\
+            var k1TopEl = CHI_ELEMENT[tuKhoa[0].top];\
+            var k1HasKe = doesOvercome(k1TopEl, dayStemEl) || doesOvercome(dayStemEl, k1TopEl);\
+            var k2TopEl = CHI_ELEMENT[tuKhoa[1].top];\
+            var k2BotEl = CHI_ELEMENT[tuKhoa[1].bottom];\
+            var k2HasKe = doesOvercome(k2TopEl, k2BotEl) || doesOvercome(k2BotEl, k2TopEl);\
+\
+            if (!k1HasKe && !k2HasKe) \{\
+                var tamHopKey = [2, 1, 0, 3, 2, 1, 0, 3, 2, 1, 0, 3];\
+                var maPositions = [8, 11, 2, 5];\
+                soTruyen = maPositions[tamHopKey[dayChi]];\
+            \} else \{\
+                if (k1HasKe && !k2HasKe) soTruyen = tuKhoa[0].top;\
+                else if (!k1HasKe && k2HasKe) soTruyen = tuKhoa[1].top;\
+                else \{\
+                    var isB1Yang = (tuKhoa[0].top % 2 === 0);\
+                    soTruyen = (isDayYang === isB1Yang) ? tuKhoa[0].top : tuKhoa[1].top;\
+                \}\
+            \}\
+            trungTruyen = thienBan[soTruyen];\
+            matTruyen = thienBan[trungTruyen];\
+            return \{ so: soTruyen, trung: trungTruyen, mat: matTruyen \};\
+        \}\
+\
+        // \'e2\'94\'80\'e2\'94\'80 T\'e1\'ba\'b7c Kh\'e1\'ba\'afc (\'e8\'b4\'bc\'e5\'85\'8b) \'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\
+        var shangKeXia = [];\
+        var xiaKeShang = [];\
+        for (var i = 0; i < 4; i++) \{\
+            var topEl = CHI_ELEMENT[tuKhoa[i].top];\
+            var botEl = (i === 0) ? dayStemEl : CHI_ELEMENT[tuKhoa[i].bottom];\
+            if (doesOvercome(topEl, botEl)) shangKeXia.push(\{ courseIdx: i, branch: tuKhoa[i].top, type: 'shangke' \});\
+            if (doesOvercome(botEl, topEl)) xiaKeShang.push(\{ courseIdx: i, branch: tuKhoa[i].top, type: 'xiake' \});\
+        \}\
+        shangKeXia = getUniqueCandidates(shangKeXia);\
+        xiaKeShang = getUniqueCandidates(xiaKeShang);\
+\
+        var candidates = (shangKeXia.length > 0) ? shangKeXia : xiaKeShang;\
+\
+        if (candidates.length === 1) \{\
+            soTruyen = candidates[0].branch;\
+        \} else if (candidates.length > 1) \{\
+            // T\'e1\'bb\'b7 D\'e1\'bb\'a5ng (\'e6\'af\'94\'e7\'94\'a8)\
+            var biYong = [];\
+            for (var i = 0; i < candidates.length; i++) \{\
+                if (isDayYang === (candidates[i].branch % 2 === 0)) biYong.push(candidates[i]);\
+            \}\
+            if (biYong.length === 1) \{\
+                soTruyen = biYong[0].branch;\
+            \} else \{\
+                // Thi\'e1\'bb\'87p H\'e1\'ba\'a1i (\'e6\'b6\'89\'e5\'ae\'b3)\
+                var cands = (biYong.length > 1) ? biYong : candidates;\
+                var maxDepth = -1;\
+                var selected = cands[0].branch;\
+                for (var i = 0; i < cands.length; i++) \{\
+                    var branch = cands[i].branch;\
+                    var type = cands[i].type;\
+                    var earthPos = -1;\
+                    for (var p = 0; p < 12; p++) \{\
+                        if (thienBan[p] === branch) \{ earthPos = p; break; \}\
+                    \}\
+                    var depth = 0;\
+                    var currentPos = earthPos;\
+                    var homePos = branch;\
+                    var targetEl = CHI_ELEMENT[branch];\
+                    for (var step = 0; step < 12; step++) \{\
+                        var earthEl = CHI_ELEMENT[currentPos];\
+                        if (type === 'shangke' && doesOvercome(targetEl, earthEl)) depth++;\
+                        if (type === 'xiake' && doesOvercome(earthEl, targetEl)) depth++;\
+                        if (currentPos === homePos) break;\
+                        currentPos = (currentPos + 1) % 12;\
+                    \}\
+                    var weight = 1;\
+                    if ([2, 8, 5, 11].indexOf(earthPos) !== -1) weight = 3;\
+                    else if ([0, 6, 3, 9].indexOf(earthPos) !== -1) weight = 2;\
+                    var totalScore = depth * 10 + weight;\
+                    if (totalScore > maxDepth) \{ maxDepth = totalScore; selected = branch; \}\
+                \}\
+                soTruyen = selected;\
+            \}\
+        \} else \{\
+            // Dao Kh\'e1\'ba\'afc (\'e9\uc0\u129 \'a5\'e5\'85\'8b)\
+            var dayVSCourses = [];\
+            for (var i = 1; i < 4; i++) \{\
+                var topEl = CHI_ELEMENT[tuKhoa[i].top];\
+                if (doesOvercome(topEl, dayStemEl)) dayVSCourses.push(\{ branch: tuKhoa[i].top \});\
+            \}\
+            dayVSCourses = getUniqueCandidates(dayVSCourses);\
+            if (dayVSCourses.length === 0) \{\
+                for (var i = 1; i < 4; i++) \{\
+                    var topEl = CHI_ELEMENT[tuKhoa[i].top];\
+                    if (doesOvercome(dayStemEl, topEl)) dayVSCourses.push(\{ branch: tuKhoa[i].top \});\
+                \}\
+                dayVSCourses = getUniqueCandidates(dayVSCourses);\
+            \}\
+            \
+            if (dayVSCourses.length === 1) \{\
+                soTruyen = dayVSCourses[0].branch;\
+            \} else if (dayVSCourses.length > 1) \{\
+                var matched = [];\
+                for (var i = 0; i < dayVSCourses.length; i++) \{\
+                    if (isDayYang === (dayVSCourses[i].branch % 2 === 0)) matched.push(dayVSCourses[i]);\
+                \}\
+                soTruyen = (matched.length > 0) ? matched[0].branch : dayVSCourses[0].branch;\
+            \} else \{\
+                // Bi\'e1\'bb\'87t Tr\uc0\u258 \'a1ch (\'e5\'88\'ab\'e8\'b4\'a3) / M\u258 \'a3o Tinh (\'e6\'98\'b4\'e6\'98\'9f)\
+                if (courseCount === 3) \{\
+                    if (isDayYang) \{\
+                        var canHop = (dayCan + 5) % 10;\
+                        soTruyen = thienBan[CAN_KY_CUNG[canHop]];\
+                        trungTruyen = thienBan[canLodge];\
+                        matTruyen = thienBan[canLodge];\
+                    \} else \{\
+                        soTruyen = (dayChi + 4) % 12;\
+                        trungTruyen = thienBan[canLodge];\
+                        matTruyen = thienBan[canLodge];\
+                    \}\
+                    return \{ so: soTruyen, trung: trungTruyen, mat: matTruyen \};\
+                \} else \{\
+                    if (isDayYang) \{\
+                        soTruyen = thienBan[9];\
+                        trungTruyen = thienBan[dayChi];\
+                        matTruyen = thienBan[canLodge];\
+                    \} else \{\
+                        for (var p = 0; p < 12; p++) \{\
+                            if (thienBan[p] === 9) \{ soTruyen = p; break; \}\
+                        \}\
+                        trungTruyen = thienBan[canLodge];\
+                        matTruyen = thienBan[dayChi];\
+                    \}\
+                    return \{ so: soTruyen, trung: trungTruyen, mat: matTruyen \};\
+                \}\
+            \}\
+        \}\
+\
+        if (trungTruyen === undefined) \{\
+            trungTruyen = thienBan[soTruyen];\
+            matTruyen = thienBan[trungTruyen];\
+        \}\
+\
+        return \{ so: soTruyen, trung: trungTruyen, mat: matTruyen \};\
+    \}\
+\
+    // ============================================================\
+    //  LO\'e1\'ba\'a0I TH\'e1\'ba\'a6N (\'e5\uc0\u141 \u129 \'e4\'ba\'8c\'e9\'a1\u158 \'e7\'a5\u158  \'e2\'80\'94 matching PTTL)\
+    // ============================================================\
+    // Placed on \'c4\uc0\u144 \'e1\'bb\'8ba B\u258 \'a0n: "Ki\'e1\'ba\'bfn" starts at dayChi position, then proceeds in order.\
+    var LOAI_THAN_NAMES = ['Ki\'e1\'ba\'bfn', 'L\'e1\'bb\'a3i', 'Ph\uc0\u258 \'bac', 'Hung', 'C\u258 \'b4', 'Ph\'e1\'ba\'bf',\
+                           'H\'c6\'b0u', 'T\'e1\'bb\'ad', 'T\uc0\u258 \'b9', 'M\'e1\'bb\'99t', 'Thai', 'V\'c6\'b0\'e1\'bb\'a3ng'];\
+\
+    function getLoaiThan(dayChi, diBan) \{\
+        return (diBan - dayChi + 12) % 12;\
+    \}\
+\
+    // ============================================================\
+    //  TH\'e1\'ba\'a6N S\uc0\u258 \u129 T \'e2\'80\'94 V\u258 \'b2ng Th\u258 \'a1i Tu\'e1\'ba\'bf (\'e5\'a4\'aa\'e6\'ad\'b2\'e5\'91\'a8\'e6\'9c\'9f) + b\'e1\'bb\'95 sung\
+    //  Verified against PTTL (phongthuyThangLong.vn)\
+    // ============================================================\
+    // 12 sao ch\uc0\u258 \'adnh \'c4\'91\'e1\'ba\'b7t theo Thi\u258 \'aan B\u258 \'a0n (TB), offset t\'e1\'bb\'ab yearChi:\
+    var VONG_THAI_TUE = [\
+        'Th\uc0\u258 \'a1i Tu\'e1\'ba\'bf',    // +0\
+        'Th\uc0\u258 \'a1i D\'c6\'b0\'c6\'a1ng',  // +1\
+        'T\uc0\u258 \'a0ng M\u258 \'b4n',    // +2\
+        'Th\uc0\u258 \'a1i \u258 \'82m',     // +3 (s\u258 \'a1t, kh\u258 \'a1c Thi\u258 \'aan T\'c6\'b0\'e1\'bb\'9bng Th\u258 \'a1i \u258 \'82m)\
+        'Quan Ph\'e1\'bb\'a7',    // +4\
+        'T\'e1\'bb\'ad Ph\'e1\'bb\'a7',      // +5\
+        'Tu\'e1\'ba\'bf Ph\uc0\u258 \'a1',     // +6\
+        'Long \'c4\uc0\u144 \'e1\'bb\'a9c',    // +7\
+        'B\'e1\'ba\'a1ch H\'e1\'bb\'95',    // +8 (s\uc0\u258 \'a1t, kh\u258 \'a1c Thi\u258 \'aan T\'c6\'b0\'e1\'bb\'9bng B\'e1\'ba\'a1ch H\'e1\'bb\'95)\
+        'Ph\uc0\u258 \'bac \'c4\u144 \'e1\'bb\'a9c',    // +9\
+        '\'c4\uc0\u144 i\'e1\'bb\u129 u Kh\u258 \'a1ch',  // +10\
+        'B\'e1\'bb\'87nh Ph\uc0\u258 \'b9'    // +11\
+    ];\
+\
+    /**\
+     * Compute Th\'e1\'ba\'a7n S\uc0\u258 \'a1t for a given palace position.\
+     * @param \{number\} yearChi - Year branch (0-11)\
+     * @param \{number\} dayChi  - Day branch (0-11)\
+     * @param \{number\} dayCan  - Day stem (0-9)\
+     * @param \{number\} tbBranch - Thi\uc0\u258 \'aan B\u258 \'a0n branch at this position (0-11)\
+     * @returns \{string[]\} List of Th\'e1\'ba\'a7n S\uc0\u258 \'a1t names at this position\
+     */\
+    function getThanSat(yearChi, dayChi, dayCan, tbBranch) \{\
+        var sats = [];\
+\
+        // \'e2\'94\'80\'e2\'94\'80 Main: V\uc0\u258 \'b2ng Th\u258 \'a1i Tu\'e1\'ba\'bf (1 star per cell, TB-based) \'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\
+        var vttIdx = (tbBranch - yearChi + 12) % 12;\
+        sats.push(VONG_THAI_TUE[vttIdx]);\
+\
+        // \'e2\'94\'80\'e2\'94\'80 Additional stars (TB-based) \'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\'e2\'94\'80\
+        var tamHopKey = [2, 1, 0, 3, 2, 1, 0, 3, 2, 1, 0, 3];\
+\
+        // Thi\uc0\u258 \'aan M\u258 \'a3 (\'e9\'a9\'9b\'e9\'a6\'ac) \'e2\'80\'94 day branch Tam H\'e1\'bb\'a3p Tr\'c6\'b0\'e1\'bb\u157 ng Sinh\
+        var maPositions = [8, 11, 2, 5]; // H\'e1\'bb\uc0\u143 a\'e2\'86\'92Th\u258 \'a2n, Kim\'e2\'86\'92H\'e1\'bb\'a3i, Th\'e1\'bb\'a7y\'e2\'86\'92D\'e1\'ba\'a7n, M\'e1\'bb\'99c\'e2\'86\'92T\'e1\'bb\'b5\
+        if (tbBranch === maPositions[tamHopKey[dayChi]]) sats.push('Thi\uc0\u258 \'aan M\u258 \'a3');\
+\
+        // \'c4\uc0\u144 \u258 \'a0o Hoa (\'e6\'a1\'83\'e8\u138 \'b1) \'e2\'80\'94 day branch Tam H\'e1\'bb\'a3p M\'e1\'bb\'99c D\'e1\'bb\'a5c\
+        var daoHoaPos = [9, 6, 3, 0];\
+        if (tbBranch === daoHoaPos[tamHopKey[dayChi]]) sats.push('\'c4\uc0\u144 \u258 \'a0o Hoa');\
+\
+        // Hoa C\uc0\u258 \'a1i (\'e8\u143 \'af\'e8\'93\'8b) \'e2\'80\'94 day branch Tam H\'e1\'bb\'a3p M\'e1\'bb\'99\
+        var hoaCaiPos = [10, 1, 4, 7];\
+        if (tbBranch === hoaCaiPos[tamHopKey[dayChi]]) sats.push('Hoa C\uc0\u258 \'a1i');\
+\
+        // \'c4\uc0\u144 \'e1\'ba\'a1i S\u258 \'a1t (\'e5\'a4\'a7\'e7\'85\u158 ) \'e2\'80\'94 year branch Tam H\'e1\'bb\'a3p M\'e1\'bb\'99\
+        var yearTHKey = tamHopKey[yearChi];\
+        var daiSatPos = [10, 1, 4, 7]; // Same positions as Hoa C\uc0\u258 \'a1i\
+        if (tbBranch === daiSatPos[yearTHKey]) sats.push('\'c4\uc0\u144 \'e1\'ba\'a1i S\u258 \'a1t');\
+\
+        // Thi\uc0\u258 \'aan H\u258 \'acnh (\'e5\'a4\'a9\'e5\'88\'91) \'e2\'80\'94 day branch H\u258 \'acnh (punishment)\
+        var hinhMap = [3, 10, 5, 0, 4, 2, 6, 1, 2, 9, 7, 11];\
+        if (tbBranch === hinhMap[dayChi]) sats.push('Thi\uc0\u258 \'aan H\u258 \'acnh');\
+\
+        // Du \'c4\uc0\u144 \u258 \'b4 (\'e9\u129 \u138 \'e9\'83\'bd) \'e2\'80\'94 yearChi + 7 (coincides with Long \'c4\u144 \'e1\'bb\'a9c position)\
+        // Only show as extra label if it doesn't duplicate the main VTT star\
+        if (tbBranch === (yearChi + 7) % 12 && vttIdx !== 7) sats.push('Du \'c4\uc0\u144 \u258 \'b4');\
+\
+        // Thi\uc0\u258 \'aan L\'e1\'bb\'99c (\'e5\'a4\'a9\'e7\'a5\'bf/\'e7\'a5\'bf\'e7\'a5\u158 ) \'e2\'80\'94 L\'e1\'bb\'99c of Day Stem\
+        var lucPos = [2, 3, 5, 6, 5, 6, 8, 9, 11, 0]; // Gi\uc0\u258 \'a1p\'e2\'86\'92D\'e1\'ba\'a7n, \'e1\'ba\'a4t\'e2\'86\'92M\u258 \'a3o...\
+        if (tbBranch === lucPos[dayCan]) sats.push('Thi\uc0\u258 \'aan L\'e1\'bb\'99c');\
+\
+        return sats;\
+    \}\
+\
+    // ============================================================\
+    //  MAIN CALCULATE\
+    // ============================================================\
+\
+    function calculate(viewDate, viewHour, viewMinute, birthDate, birthHour, birthMinute, gender) \{\
+        viewHour = parseInt(viewHour) || 0;\
+        viewMinute = parseInt(viewMinute) || 0;\
+\
+        var year = viewDate.getFullYear();\
+        var month = viewDate.getMonth() + 1;\
+        var day = viewDate.getDate();\
+\
+        // Handle 23:00+ \'e2\'86\'92 next day's T\uc0\u258 \'bd hour\
+        var effectiveYear = year, effectiveMonth = month, effectiveDay = day;\
+        if (viewHour >= 23) \{\
+            var nextDay = new Date(year, month - 1, day + 1);\
+            effectiveYear = nextDay.getFullYear();\
+            effectiveMonth = nextDay.getMonth() + 1;\
+            effectiveDay = nextDay.getDate();\
+        \}\
+\
+        // Solar term (using original date for term lookup)\
+        var solarTerm = KMDG_Solar.getCurrentSolarTerm(viewDate, viewHour, viewMinute);\
+\
+        // Four Pillars \'e2\'80\'94 using effective date for 23:00+ shift for Day Pillar\
+        // Year and Month pillars use EXACT time (un-shifted) to compare with solar terms\
+        var yearCC = getYearCanChi(year, month, day, viewHour, viewMinute);\
+        var monthCC = getMonthCanChi(yearCC.can, solarTerm.name);\
+        var dayCC = getDayCanChi(effectiveYear, effectiveMonth, effectiveDay);\
+\
+        var hourChi = getHourChi(viewHour);\
+        var hourCan = getHourCan(dayCC.can, hourChi);\
+        var hourCC = \{ can: hourCan, chi: hourChi, jiaZi: getJiaZiIndex(hourCan, hourChi) \};\
+        \
+        // Birth Pillars & KW (optional \'e2\'80\'94 only if birthDate provided)\
+        var birthPillars = null;\
+        var birthKW = null;\
+        if (birthDate) \{\
+            var byy = birthDate.getFullYear();\
+            var bmm = birthDate.getMonth() + 1;\
+            var bdd = birthDate.getDate();\
+            var bhh = birthHour || 0;\
+            var bmin = birthMinute || 0;\
+            \
+            // Handle 23:00+ \'e2\'86\'92 next day's T\uc0\u258 \'bd hour for Birth Date\
+            var effByy = byy, effBmm = bmm, effBdd = bdd;\
+            if (bhh >= 23) \{\
+                var bNextDay = new Date(byy, bmm - 1, bdd + 1);\
+                effByy = bNextDay.getFullYear();\
+                effBmm = bNextDay.getMonth() + 1;\
+                effBdd = bNextDay.getDate();\
+            \}\
+\
+            var bsolarTerm = KMDG_Solar.getCurrentSolarTerm(birthDate, bhh, bmin);\
+            var byCC = getYearCanChi(byy, bmm, bdd, bhh, bmin); // Use exact time for Year Pillar\
+            var bmCC = getMonthCanChi(byCC.can, bsolarTerm.name); // Month Pillar relies on exact solar term\
+            var bdCC = getDayCanChi(effByy, effBmm, effBdd); // Day Pillar uses effective date\
+            var bhChi = getHourChi(bhh);\
+            var bhCan = getHourCan(bdCC.can, bhChi); // Hour Can relies on effective day Can\
+            var bhCC = \{ can: bhCan, chi: bhChi, jiaZi: getJiaZiIndex(bhCan, bhChi) \};\
+\
+            birthPillars = \{ year: byCC, month: bmCC, day: bdCC, hour: bhCC \};\
+            var birthKwYear = getKongWang(birthPillars.year.jiaZi);\
+            var birthKwMonth = getKongWang(birthPillars.month.jiaZi);\
+            var birthKwDay = getKongWang(birthPillars.day.jiaZi);\
+            var birthKwHour = getKongWang(birthPillars.hour.jiaZi);\
+            birthKW = \{ year: birthKwYear, month: birthKwMonth, day: birthKwDay, hour: birthKwHour \};\
+        \}\
+\
+        // Nguy\'e1\'bb\'87t T\'c6\'b0\'e1\'bb\'9bng\
+        var nguyetTuong = getNguyetTuong(year, month, day, viewHour, viewMinute);\
+\
+        // Thi\uc0\u258 \'aan B\u258 \'a0n\
+        var thienBan = buildThienBan(nguyetTuong.branch, hourChi);\
+\
+        // Qu\uc0\u258 \'bd Nh\u258 \'a2n & Thi\u258 \'aan T\'c6\'b0\'e1\'bb\'9bng\
+        var quyNhanBranch = getQuyNhanBranch(dayCC.can, hourChi);\
+        var thienTuong = buildThienTuong(quyNhanBranch, thienBan);\
+\
+        // T\'e1\'bb\'a9 Kh\uc0\u258 \'b3a\
+        var tuKhoa = buildTuKhoa(dayCC.can, dayCC.chi, thienBan);\
+\
+        // Tam Truy\'e1\'bb\uc0\u129 n\
+        var tamTruyen = buildTamTruyen(tuKhoa, dayCC.can, thienBan);\
+\
+        // Kh\uc0\u258 \'b4ng Vong for each pillar\
+        var kvYear = getKongWang(yearCC.jiaZi);\
+        var kvMonth = getKongWang(monthCC.jiaZi);\
+        var kvDay = getKongWang(dayCC.jiaZi);\
+        var kvHour = getKongWang(hourCC.jiaZi);\
+\
+        // Nguy\uc0\u258 \'aan determination (for L\'e1\'bb\'a5c Nh\u258 \'a2m: based on day's position in term)\
+        var yuan = getYuan(dayCC.can, dayCC.chi);\
+\
+        // Build full palace data (12 positions)\
+        var palaces = [];\
+        var dayStemEl = CAN_ELEMENT[dayCC.can];\
+        for (var p = 0; p < 12; p++) \{\
+            var tbBranch = thienBan[p];\
+            var generalIdx = thienTuong[tbBranch]; // Lookup by Thi\uc0\u258 \'aan B\u258 \'a0n branch\
+            var lucThan = getLucThan(dayStemEl, CHI_ELEMENT[tbBranch]);\
+            var truongSinh = getTruongSinh(dayCC.can, p);\
+            var thanSat = getThanSat(yearCC.chi, dayCC.chi, dayCC.can, tbBranch);\
+            var loaiThanIdx = getLoaiThan(dayCC.chi, p);\
+\
+            palaces[p] = \{\
+                diBan: p,                          // \'c4\uc0\u144 \'e1\'bb\'8ba B\u258 \'a0n branch (fixed)\
+                thienBan: tbBranch,                // Thi\uc0\u258 \'aan B\u258 \'a0n branch\
+                thienBanName: DIA_CHI[tbBranch],\
+                nguyetTuongName: NGUYET_TUONG_NAMES[p], // Name of this \'c4\uc0\u144 \'e1\'bb\'8ba B\u258 \'a0n branch\
+                generalIdx: generalIdx !== undefined ? generalIdx : -1,\
+                generalName: generalIdx !== undefined ? THIEN_TUONG[generalIdx].name : '',\
+                lucThan: lucThan,\
+                lucThanName: LUC_THAN_NAMES[lucThan],\
+                loaiThan: loaiThanIdx,\
+                loaiThanName: LOAI_THAN_NAMES[loaiThanIdx],\
+                truongSinh: truongSinh,\
+                truongSinhName: TRUONG_SINH_NAMES[truongSinh],\
+                thanSat: thanSat\
+            \};\
+        \}\
+\
+        // Enrich T\'e1\'bb\'a9 Kh\uc0\u258 \'b3a with Thi\u258 \'aan T\'c6\'b0\'e1\'bb\'9bng and L\'e1\'bb\'a5c Th\u258 \'a2n\
+        for (var i = 0; i < 4; i++) \{\
+            var tk = tuKhoa[i];\
+            var ttIdx = thienTuong[tk.top];\
+            tk.generalIdx = ttIdx !== undefined ? ttIdx : -1;\
+            tk.generalName = ttIdx !== undefined ? THIEN_TUONG[ttIdx].name : '';\
+            tk.lucThan = getLucThan(dayStemEl, CHI_ELEMENT[tk.top]);\
+            tk.lucThanName = LUC_THAN_NAMES[tk.lucThan] || '';\
+        \}\
+\
+        // Enrich Tam Truy\'e1\'bb\uc0\u129 n\
+        var tamTruyenData = [\
+            \{ label: 'S\'c6\'a1',   branch: tamTruyen.so \},\
+            \{ label: 'Trung', branch: tamTruyen.trung \},\
+            \{ label: 'M\'e1\'ba\'a1t',  branch: tamTruyen.mat \}\
+        ];\
+        for (var i = 0; i < 3; i++) \{\
+            var tt = tamTruyenData[i];\
+            var ttIdx = thienTuong[tt.branch];\
+            tt.branchName = DIA_CHI[tt.branch];\
+            tt.generalIdx = ttIdx !== undefined ? ttIdx : -1;\
+            tt.generalName = ttIdx !== undefined ? THIEN_TUONG[ttIdx].name : '';\
+            tt.lucThan = getLucThan(dayStemEl, CHI_ELEMENT[tt.branch]);\
+            tt.lucThanName = LUC_THAN_NAMES[tt.lucThan] || '';\
+            tt.truongSinh = getTruongSinh(dayCC.can, tt.branch);\
+            tt.truongSinhName = TRUONG_SINH_NAMES[tt.truongSinh] || '';\
+        \}\
+\
+        return \{\
+            // Input info\
+            viewDate: viewDate,\
+            viewHour: viewHour,\
+            viewMinute: viewMinute,\
+            birthInfo: birthDate ? \{\
+                date: birthDate,\
+                hour: birthHour || 0,\
+                minute: birthMinute || 0,\
+                gender: gender || 'Nam'\
+            \} : null,\
+\
+            // Four Pillars\
+            fourPillars: \{\
+                year: yearCC, month: monthCC, day: dayCC, hour: hourCC\
+            \},\
+            birthPillars: birthPillars,\
+\
+            // Solar term\
+            solarTerm: solarTerm,\
+            yuan: yuan,\
+            yuanName: yuan || '', // String directly returned by getYuan\
+\
+            // Nguy\'e1\'bb\'87t T\'c6\'b0\'e1\'bb\'9bng\
+            nguyetTuong: nguyetTuong,\
+\
+            // Thi\uc0\u258 \'aan \'c4\u144 \'e1\'bb\'8ba B\u258 \'a0n\
+            thienBan: thienBan,\
+            palaces: palaces,\
+\
+            // Qu\uc0\u258 \'bd Nh\u258 \'a2n\
+            quyNhanBranch: quyNhanBranch,\
+            isDaytime: isDaytime(hourChi),\
+\
+            // Thi\uc0\u258 \'aan T\'c6\'b0\'e1\'bb\'9bng map\
+            thienTuong: thienTuong,\
+\
+            // T\'e1\'bb\'a9 Kh\uc0\u258 \'b3a\
+            tuKhoa: tuKhoa,\
+\
+            // Tam Truy\'e1\'bb\uc0\u129 n\
+            tamTruyen: tamTruyenData,\
+\
+            // Kh\uc0\u258 \'b4ng Vong\
+            kongWang: \{\
+                year: kvYear, month: kvMonth, day: kvDay, hour: kvHour\
+            \},\
+            birthKW: birthKW,\
+            birthKongWang: birthKW,\
+            _hasBirth: !!birthDate,\
+            _gender: gender || 'Nam',\
+\
+            // Day info\
+            dayCan: dayCC.can,\
+            dayChi: dayCC.chi\
+        \};\
+    \}\
+\
+    function getYuan(can, chi) \{\
+        // Nguy\uc0\u258 \'aan (Th\'c6\'b0\'e1\'bb\'a3ng/Trung/H\'e1\'ba\'a1) \'c4\'91\'c6\'b0\'e1\'bb\'a3c t\u258 \'adnh theo Ph\u258 \'b9 \'c4\u144 \'e1\'ba\'a7u (ng\u258 \'a0y Gi\u258 \'a1p ho\'e1\'ba\'b7c K\'e1\'bb\'b7 g\'e1\'ba\'a7n nh\'e1\'ba\'a5t)\
+        // M\'e1\'bb\'97i Nguy\uc0\u258 \'aan k\u258 \'a9o d\u258 \'a0i 5 ng\u258 \'a0y.\
+        var offset = can % 5;\
+        var phuDauChi = (chi - offset + 12) % 12;\
+        \
+        // T\uc0\u258 \'bd(0), M\u258 \'a3o(3), Ng\'e1\'bb\u141 (6), D\'e1\'ba\'adu(9) -> % 3 = 0 -> Th\'c6\'b0\'e1\'bb\'a3ng Nguy\u258 \'aan\
+        // S\'e1\'bb\'adu(1), Th\uc0\u258 \'acn(4), M\u258 \'b9i(7), Tu\'e1\'ba\'a5t(10) -> % 3 = 1 -> H\'e1\'ba\'a1 Nguy\u258 \'aan\
+        // D\'e1\'ba\'a7n(2), T\'e1\'bb\'b5(5), Th\uc0\u258 \'a2n(8), H\'e1\'bb\'a3i(11) -> % 3 = 2 -> Trung Nguy\u258 \'aan\
+        var mod = phuDauChi % 3;\
+        if (mod === 0) return 'Th\'c6\'b0\'e1\'bb\'a3ng Nguy\uc0\u258 \'aan';\
+        if (mod === 1) return 'H\'e1\'ba\'a1 Nguy\uc0\u258 \'aan';\
+        if (mod === 2) return 'Trung Nguy\uc0\u258 \'aan';\
+        return 'Th\'c6\'b0\'e1\'bb\'a3ng Nguy\uc0\u258 \'aan';\
+    \}\
+\
+    // ============================================================\
+    //  UTILITY & EXPORTS\
+    // ============================================================\
+\
+    function formatCanChi(cc) \{\
+        return THIEN_CAN[cc.can] + ' ' + DIA_CHI[cc.chi];\
+    \}\
+\
+    function getCanName(idx) \{ return THIEN_CAN[idx]; \}\
+    function getChiName(idx) \{ return DIA_CHI[idx]; \}\
+\
+    // ============================================================\
+    //  RAW TEXT FOR AI\
+    // ============================================================\
+\
+    function generateRawText(result) \{\
+        var lines = [];\
+        lines.push('H\uc0\u258 \'a3y \'c4\'91\u258 \'b3ng vai m\'e1\'bb\'99t chuy\u258 \'aan gia L\'e1\'bb\'a5c Nh\u258 \'a2m \'c4\u144 \'e1\'ba\'a1i \'c4\u144 \'e1\'bb\'99n (\'e5\'a4\'a7\'e5\'85\'ad\'e5\'a3\'ac) v\u258 \'a0 lu\'e1\'ba\'adn gi\'e1\'ba\'a3i b\u258 \'a0n qu\'e1\'ba\'bb n\u258 \'a0y.');\
+        if (result._question) \{\
+            lines.push('');\
+            lines.push('**C\uc0\u258 \'a2u h\'e1\'bb\u143 i c\'e1\'bb\'a7a ng\'c6\'b0\'e1\'bb\u157 i xem:** ' + result._question);\
+        \}\
+        lines.push('');\
+        lines.push('**Th\uc0\u258 \'b4ng tin th\'e1\'bb\u157 i gian l\'e1\'ba\'adp qu\'e1\'ba\'bb:**');\
+        lines.push('\'e2\'80\'93 N\'c4\'83m: ' + formatCanChi(result.fourPillars.year));\
+        lines.push('\'e2\'80\'93 Th\uc0\u258 \'a1ng: ' + formatCanChi(result.fourPillars.month));\
+        lines.push('\'e2\'80\'93 Ng\uc0\u258 \'a0y: ' + formatCanChi(result.fourPillars.day));\
+        lines.push('\'e2\'80\'93 Gi\'e1\'bb\uc0\u157 : ' + formatCanChi(result.fourPillars.hour));\
+        lines.push('\'e2\'80\'93 Ti\'e1\'ba\'bft kh\uc0\u258 \'ad: ' + result.solarTerm.name);\
+        lines.push('\'e2\'80\'93 Nguy\uc0\u258 \'aan: ' + result.yuanName);\
+        lines.push('\'e2\'80\'93 Nguy\'e1\'bb\'87t T\'c6\'b0\'e1\'bb\'9bng: ' + DIA_CHI[result.nguyetTuong.branch] + ' (' + result.nguyetTuong.name + ')');\
+        lines.push('\'e2\'80\'93 Qu\uc0\u258 \'bd Nh\u258 \'a2n: ' + DIA_CHI[result.quyNhanBranch] + ' (' + (result.isDaytime ? 'Ng\u258 \'a0y' : '\'c4\u144 \u258 \'aam') + ' qu\u258 \'bd)');\
+\
+        // Kh\uc0\u258 \'b4ng vong (qu\'e1\'ba\'bb)\
+        var kvParts = [];\
+        kvParts.push(DIA_CHI[result.kongWang.day[0]] + ' ' + DIA_CHI[result.kongWang.day[1]]);\
+        lines.push('\'e2\'80\'93 Kh\uc0\u258 \'b4ng Vong (Ng\u258 \'a0y): ' + kvParts.join(', '));\
+\
+        // Sinh th\'e1\'ba\'a7n (birth data) \'e2\'80\'94 if provided\
+        if (result._hasBirth && result.birthPillars) \{\
+            lines.push('');\
+            lines.push('**Th\uc0\u258 \'b4ng tin ng\'c6\'b0\'e1\'bb\u157 i h\'e1\'bb\u143 i (Sinh Th\'e1\'ba\'a7n):**');\
+            lines.push('\'e2\'80\'93 B\uc0\u258 \'a1t T\'e1\'bb\'b1: ' +\
+                formatCanChi(result.birthPillars.year) + ', ' +\
+                formatCanChi(result.birthPillars.month) + ', ' +\
+                formatCanChi(result.birthPillars.day) + ', ' +\
+                formatCanChi(result.birthPillars.hour));\
+            lines.push('\'e2\'80\'93 Gi\'e1\'bb\'9bi t\uc0\u258 \'adnh: ' + (result._gender || 'Nam'));\
+            if (result.birthKongWang) \{\
+                var bkv = result.birthKongWang;\
+                lines.push('\'e2\'80\'93 Kh\uc0\u258 \'b4ng Vong (Sinh Th\'e1\'ba\'a7n):');\
+                lines.push('  + N\'c4\'83m sinh: ' + DIA_CHI[bkv.year[0]] + ' ' + DIA_CHI[bkv.year[1]]);\
+                lines.push('  + Ng\uc0\u258 \'a0y sinh: ' + DIA_CHI[bkv.day[0]] + ' ' + DIA_CHI[bkv.day[1]]);\
+            \}\
+            // M\'e1\'bb\'87nh (year branch) for reference\
+            lines.push('\'e2\'80\'93 M\'e1\'bb\'87nh (n\'c4\'83m sinh): ' + DIA_CHI[result.birthPillars.year.chi]);\
+            // Nh\'e1\'ba\'adt Can sinh \'e2\'86\'92 Ng\'c5\'a9 H\uc0\u258 \'a0nh of person\
+            lines.push('\'e2\'80\'93 Nh\'e1\'ba\'adt Ch\'e1\'bb\'a7 (ng\uc0\u258 \'a0y sinh): ' + THIEN_CAN[result.birthPillars.day.can] +\
+                ' (' + NGU_HANH[CAN_ELEMENT[result.birthPillars.day.can]] + ')');\
+        \}\
+        lines.push('');\
+\
+        // T\'e1\'bb\'a9 Kh\uc0\u258 \'b3a\
+        lines.push('**T\'e1\'bb\'a9 Kh\uc0\u258 \'b3a:**');\
+        for (var i = 0; i < 4; i++) \{\
+            var tk = result.tuKhoa[i];\
+            lines.push('\'e2\'80\'93 Kh\uc0\u258 \'b3a ' + tk.label + ': ' + DIA_CHI[tk.top] + '/' + DIA_CHI[tk.bottom] +\
+                ' [' + tk.generalName + '] [' + tk.lucThanName + ']');\
+        \}\
+        lines.push('');\
+\
+        // Tam Truy\'e1\'bb\uc0\u129 n\
+        lines.push('**Tam Truy\'e1\'bb\uc0\u129 n:**');\
+        for (var i = 0; i < 3; i++) \{\
+            var tt = result.tamTruyen[i];\
+            lines.push('\'e2\'80\'93 ' + tt.label + ' Truy\'e1\'bb\uc0\u129 n: ' + tt.branchName +\
+                ' [' + tt.generalName + '] [' + tt.lucThanName + ']');\
+        \}\
+        lines.push('');\
+\
+        // Thi\uc0\u258 \'aan \'c4\u144 \'e1\'bb\'8ba B\u258 \'a0n (12 cung) \'e2\'80\'94 updated with Lo\'e1\'ba\'a1i Th\'e1\'ba\'a7n + Th\'e1\'ba\'a7n S\u258 \'a1t\
+        lines.push('**Thi\uc0\u258 \'aan \'c4\u144 \'e1\'bb\'8ba B\u258 \'a0n (12 cung):**');\
+        for (var p = 0; p < 12; p++) \{\
+            var pal = result.palaces[p];\
+            var thanSatStr = (pal.thanSat && pal.thanSat.length > 0) ? pal.thanSat.join(', ') : '';\
+            lines.push('\'e2\'80\'93 ' + DIA_CHI[p] + ' (\'c4\uc0\u144 \'e1\'bb\'8ba) \'e2\'86\u144  ' + pal.thienBanName + ' (Thi\u258 \'aan): ' +\
+                pal.generalName + ', ' + pal.loaiThanName + ', ' + thanSatStr);\
+        \}\
+\
+        return lines.join('\\n');\
+    \}\
+\
+    return \{\
+        calculate: calculate,\
+        formatCanChi: formatCanChi,\
+        getCanName: getCanName,\
+        getChiName: getChiName,\
+        generateRawText: generateRawText,\
+        THIEN_CAN: THIEN_CAN,\
+        DIA_CHI: DIA_CHI,\
+        NGU_HANH: NGU_HANH,\
+        THIEN_TUONG: THIEN_TUONG,\
+        NGUYET_TUONG_NAMES: NGUYET_TUONG_NAMES,\
+        LUC_THAN_NAMES: LUC_THAN_NAMES,\
+        LOAI_THAN_NAMES: LOAI_THAN_NAMES,\
+        VONG_THAI_TUE: VONG_THAI_TUE,\
+        TRUONG_SINH_NAMES: TRUONG_SINH_NAMES,\
+        CHI_ELEMENT: CHI_ELEMENT,\
+        CAN_ELEMENT: CAN_ELEMENT\
+    \};\
+\})();\
+}

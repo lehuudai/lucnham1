@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch Sử Gieo Quẻ - Lục Nhâm</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; color: #2c3e50; padding: 20px; line-height: 1.6;}
+        .container { max-width: 1100px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        h2 { border-bottom: 2px solid #2980b9; padding-bottom: 10px; color: #2980b9; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border: 1px solid #dcdde1; padding: 12px; text-align: left; }
+        th { background-color: #2c3e50; color: white; font-weight: bold; }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        tr:hover { background-color: #e8f4f8; }
+        .btn-back { display: inline-block; padding: 10px 15px; background: #e74c3c; color: white; text-decoration: none; border-radius: 4px; margin-bottom: 20px; font-weight: bold;}
+        .tag-nhom { background: #d35400; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold;}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="btn-back">⬅ Quay Lại Bàn Gieo Quẻ</a>
+        <h2>📚 Kho Lưu Trữ Hồ Sơ Khách Hàng (Tự động)</h2>
+        <p><i>Mỗi khi bạn bấm gieo một quẻ mới trên hệ thống, toàn bộ Tinh bàn, thông số và lời giải sẽ được lưu lại tự động tại đây.</i></p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%;">ID</th>
+                    <th style="width: 15%;">Thời điểm gieo</th>
+                    <th style="width: 20%;">Thời gian sự việc (Chiêm thời)</th>
+                    <th style="width: 15%;">Nhóm vấn đề</th>
+                    <th style="width: 45%;">Câu hỏi của khách</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in records %}
+                <tr>
+                    <td style="font-weight: bold; color: #7f8c8d;">#{{ r.id }}</td>
+                    <td style="font-size: 12px; color: #95a5a6;">{{ r.tao_luc }}</td>
+                    <td style="font-weight: bold; color: #2980b9;">{{ r.thoi_gian_que }}</td>
+                    <td><span class="tag-nhom">{{ r.nhom_van_de | upper }}</span></td>
+                    <td style="font-weight: bold;">{{ r.cau_hoi if r.cau_hoi else '<span style="color:#bdc3c7; font-weight:normal;">(Chỉ luận giải tổng quan)</span>'|safe }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 30px; color: #7f8c8d;">Chưa có dữ liệu quẻ nào được lưu trữ. Hãy ra ngoài gieo một quẻ đầu tiên!</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
